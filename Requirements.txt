@@ -1,0 +1,85 @@
+# ======================================================
+#   J.A.R.V.I.S. NEURAL PATHWAYS - PYTHON 3.11 BUILD
+# ======================================================
+
+# --- Core AI, Vision & API ---
+python-dotenv
+groq
+cohere
+requests
+bytez
+transformers
+huggingface-hub==1.4.1
+
+# --- Phase 3: Memory & Database ---
+chromadb
+sentence-transformers
+numpy<2.0               # CRITICAL FIX: Required for Mediapipe & SpeechBrain stability
+spotipy 
+pushbullet.py
+python-docx
+python-pptx             # Executive Suite: Presentations
+openpyxl                # Executive Suite: Excel
+pandas                  # Executive Suite: Data
+mediapipe 
+opencv-python 
+pyautogui
+
+# --- Smart Home & Networks (Mark III Upgrades) ---
+adb-shell               # CRITICAL: Required for Android TV/Dawlance Network Bypass
+rsa                     # CRITICAL: Required for ADB keygen and authentication
+
+# --- Web & Search ---
+googlesearch-python
+duckduckgo-search       # CRITICAL FIX: The pip package name for DDGS
+wikipedia
+yfinance
+selenium
+webdriver-manager
+beautifulsoup4
+lxml
+fastf1 
+matplotlib
+mplfinance
+pydantic>=2.0           # CRITICAL FIX: Required for F1 Telemetry Module
+
+# --- Audio & Speech (Phase 4 Biometrics) ---
+SpeechRecognition
+torchcodec
+pyaudio
+edge-tts
+pygame
+pyttsx3
+mtranslate
+pywhatkit
+torch 
+torchaudio 
+speechbrain
+pvporcupine 
+pvrecorder
+
+# --- System Automation & Tools ---
+AppOpener
+keyboard
+psutil
+pyperclip
+sounddevice 
+scipy 
+soundfile
+screen-brightness-control
+
+# --- GUI & Graphics ---
+PyQt5
+PyQt5-Qt5
+PyQt5-sip
+rich
+colorama
+Pillow
+qrcode
+
+# --- Build Tools ---
+pyinstaller
+setuptools
+arcade
+PySide6
+questionary

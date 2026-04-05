@@ -1,0 +1,282 @@
+📁 J.A.R.V.I.S/
+├── .fastf1-cache
+│   ├── 2023
+│   │   └── 2023-05-07_Miami_Grand_Prix
+│   │       ├── 2023-05-06_Qualifying
+│   │       │   ├── _extended_timing_data.ff1pkl
+│   │       │   ├── car_data.ff1pkl
+│   │       │   ├── driver_info.ff1pkl
+│   │       │   ├── position_data.ff1pkl
+│   │       │   ├── race_control_messages.ff1pkl
+│   │       │   ├── session_info.ff1pkl
+│   │       │   ├── session_status_data.ff1pkl
+│   │       │   ├── timing_app_data.ff1pkl
+│   │       │   ├── track_status_data.ff1pkl
+│   │       │   └── weather_data.ff1pkl
+│   │       └── 2023-05-07_Race
+│   │           └── driver_info.ff1pkl
+│   ├── 2025
+│   │   └── 2025-12-07_Abu_Dhabi_Grand_Prix
+│   │       └── 2025-12-07_Race
+│   │           ├── driver_info.ff1pkl
+│   │           ├── lap_count.ff1pkl
+│   │           ├── session_info.ff1pkl
+│   │           ├── session_status_data.ff1pkl
+│   │           └── track_status_data.ff1pkl
+│   ├── 2026
+│   │   └── 2026-03-15_Chinese_Grand_Prix
+│   │       └── 2026-03-15_Race
+│   │           ├── _extended_timing_data.ff1pkl
+│   │           ├── car_data.ff1pkl
+│   │           ├── driver_info.ff1pkl
+│   │           ├── lap_count.ff1pkl
+│   │           ├── position_data.ff1pkl
+│   │           ├── race_control_messages.ff1pkl
+│   │           ├── session_info.ff1pkl
+│   │           ├── session_status_data.ff1pkl
+│   │           ├── timing_app_data.ff1pkl
+│   │           ├── track_status_data.ff1pkl
+│   │           └── weather_data.ff1pkl
+│   └── fastf1_http_cache.sqlite
+├── .github
+│   └── appmod
+│       └── appcat
+├── Backend
+│   ├── Data
+│   │   └── VoicePrints
+│   ├── AgentLoop.py
+│   ├── Automation.py
+│   ├── Background_Monitor.py
+│   ├── Brain.py
+│   ├── Chatbot.py
+│   ├── ClipboardReader.py
+│   ├── DSA_Manager.py
+│   ├── EarthTracker.py
+│   ├── EmailReader.py
+│   ├── F1_Engineer.py
+│   ├── FileOrganizer.py
+│   ├── ImageGeneration.py
+│   ├── LocalCoder.py
+│   ├── Memory.py
+│   ├── MemoryDB.py
+│   ├── Model.py
+│   ├── NervousSystem.py
+│   ├── News_Engine.py
+│   ├── PhoneLink.py
+│   ├── Quant_Broker.py
+│   ├── RealtimeSearchEngine.py
+│   ├── Sandbox.py
+│   ├── Security.py
+│   ├── SmartTV.py
+│   ├── SpeechToText.py
+│   ├── SpotifyController.py
+│   ├── TextToSpeech.py
+│   ├── Vision.py
+│   ├── VisionSentry.py
+│   ├── VoiceAuth.py
+│   ├── Workspace.py
+│   └── __init__.py
+├── Data
+│   ├── Charts
+│   ├── F1_Cache
+│   │   ├── 2026
+│   │   │   ├── 2026-03-08_Australian_Grand_Prix
+│   │   │   │   └── 2026-03-08_Race
+│   │   │   │       ├── _extended_timing_data.ff1pkl
+│   │   │   │       ├── car_data.ff1pkl
+│   │   │   │       ├── driver_info.ff1pkl
+│   │   │   │       ├── lap_count.ff1pkl
+│   │   │   │       ├── position_data.ff1pkl
+│   │   │   │       ├── session_info.ff1pkl
+│   │   │   │       ├── session_status_data.ff1pkl
+│   │   │   │       ├── timing_app_data.ff1pkl
+│   │   │   │       └── track_status_data.ff1pkl
+│   │   │   ├── 2026-03-15_Chinese_Grand_Prix
+│   │   │   │   └── 2026-03-15_Race
+│   │   │   │       ├── _extended_timing_data.ff1pkl
+│   │   │   │       ├── car_data.ff1pkl
+│   │   │   │       ├── driver_info.ff1pkl
+│   │   │   │       ├── lap_count.ff1pkl
+│   │   │   │       ├── position_data.ff1pkl
+│   │   │   │       ├── session_info.ff1pkl
+│   │   │   │       ├── session_status_data.ff1pkl
+│   │   │   │       ├── timing_app_data.ff1pkl
+│   │   │   │       └── track_status_data.ff1pkl
+│   │   │   ├── 2026-03-29_Japanese_Grand_Prix
+│   │   │   │   └── 2026-03-29_Race
+│   │   │   │       ├── _extended_timing_data.ff1pkl
+│   │   │   │       ├── driver_info.ff1pkl
+│   │   │   │       ├── lap_count.ff1pkl
+│   │   │   │       ├── session_info.ff1pkl
+│   │   │   │       ├── session_status_data.ff1pkl
+│   │   │   │       ├── timing_app_data.ff1pkl
+│   │   │   │       └── track_status_data.ff1pkl
+│   │   │   └── 2026-07-26_Hungarian_Grand_Prix
+│   │   │       └── 2026-07-26_Race
+│   │   └── fastf1_http_cache.sqlite
+│   ├── Intruders
+│   ├── VectorMemory
+│   │   └── 42a785d2-5644-4c70-9bbd-60e59e990000
+│   │       ├── data_level0.bin
+│   │       ├── header.bin
+│   │       ├── length.bin
+│   │       └── link_lists.bin
+│   ├── VoicePrints
+│   │   ├── Areeb.pt
+│   │   ├── Dawood.pt
+│   │   └── Fariya.pt
+│   ├── Memory.txt
+│   ├── MicIndex.txt
+│   ├── Voice.html
+│   ├── adbkey
+│   ├── adbkey.pub
+│   └── speech.mp3
+├── Frontend
+│   ├── Files
+│   │   ├── AssistantStatus.data
+│   │   ├── Database.data
+│   │   ├── ImageGeneration.data
+│   │   ├── Mic.data
+│   │   ├── Responses.data
+│   │   └── Status.data
+│   ├── Graphics
+│   │   ├── Chats.png
+│   │   ├── Close.png
+│   │   ├── Home.png
+│   │   ├── Jarvis.gif
+│   │   ├── Jarvis.ico
+│   │   ├── Maximize.png
+│   │   ├── Mic_off.png
+│   │   ├── Mic_on.png
+│   │   ├── Minimize.png
+│   │   ├── Minimize2.png
+│   │   └── Settings.png
+│   └── GUI.py
+├── computed_data
+│   └── 2023_Season_Round_5
+├── f1-race-replay
+│   ├── .fastf1-cache
+│   │   ├── 2026
+│   │   │   ├── 2026-03-15_Chinese_Grand_Prix
+│   │   │   │   ├── 2026-03-14_Qualifying
+│   │   │   │   │   ├── _extended_timing_data.ff1pkl
+│   │   │   │   │   ├── car_data.ff1pkl
+│   │   │   │   │   ├── driver_info.ff1pkl
+│   │   │   │   │   ├── position_data.ff1pkl
+│   │   │   │   │   ├── race_control_messages.ff1pkl
+│   │   │   │   │   ├── session_info.ff1pkl
+│   │   │   │   │   ├── session_status_data.ff1pkl
+│   │   │   │   │   ├── timing_app_data.ff1pkl
+│   │   │   │   │   ├── track_status_data.ff1pkl
+│   │   │   │   │   └── weather_data.ff1pkl
+│   │   │   │   └── 2026-03-15_Race
+│   │   │   │       └── driver_info.ff1pkl
+│   │   │   └── 2026-03-29_Japanese_Grand_Prix
+│   │   │       ├── 2026-03-28_Qualifying
+│   │   │       │   ├── _extended_timing_data.ff1pkl
+│   │   │       │   ├── car_data.ff1pkl
+│   │   │       │   ├── driver_info.ff1pkl
+│   │   │       │   ├── position_data.ff1pkl
+│   │   │       │   ├── race_control_messages.ff1pkl
+│   │   │       │   ├── session_info.ff1pkl
+│   │   │       │   ├── session_status_data.ff1pkl
+│   │   │       │   ├── timing_app_data.ff1pkl
+│   │   │       │   ├── track_status_data.ff1pkl
+│   │   │       │   └── weather_data.ff1pkl
+│   │   │       └── 2026-03-29_Race
+│   │   │           └── driver_info.ff1pkl
+│   │   └── fastf1_http_cache.sqlite
+│   ├── computed_data
+│   │   ├── 2026_Season_Round_2
+│   │   └── 2026_Season_Round_3
+│   ├── docs
+│   │   ├── InsightsMenu.md
+│   │   └── PitWallWindow.md
+│   ├── images
+│   │   ├── controls
+│   │   │   ├── arrow-down.png
+│   │   │   ├── arrow-left.png
+│   │   │   ├── arrow-right.png
+│   │   │   ├── arrow-up.png
+│   │   │   ├── pause.png
+│   │   │   ├── play.png
+│   │   │   ├── rewind.png
+│   │   │   ├── speed+.png
+│   │   │   └── speed-.png
+│   │   ├── tyres
+│   │   │   ├── 0.0.png
+│   │   │   ├── 1.0.png
+│   │   │   ├── 2.0.png
+│   │   │   ├── 3.0.png
+│   │   │   └── 4.0.png
+│   │   └── weather
+│   │       ├── drop.png
+│   │       ├── rain.png
+│   │       ├── thermometer.png
+│   │       └── wind.png
+│   ├── resources
+│   │   ├── cli-menu.gif
+│   │   ├── gui-menu.png
+│   │   ├── insights-menu.png
+│   │   ├── pit-wall-window-template.png
+│   │   ├── preview.png
+│   │   └── telemetry-logger.png
+│   ├── src
+│   │   ├── cli
+│   │   │   └── race_selection.py
+│   │   ├── gui
+│   │   │   ├── insights_menu.py
+│   │   │   ├── pit_wall_window.py
+│   │   │   ├── pit_wall_window_template.py
+│   │   │   ├── race_selection.py
+│   │   │   └── settings_dialog.py
+│   │   ├── insights
+│   │   │   ├── driver_telemetry_window.py
+│   │   │   ├── example_pit_wall_window.py
+│   │   │   ├── telemetry_stream_viewer.py
+│   │   │   └── track_position_window.py
+│   │   ├── interfaces
+│   │   │   ├── qualifying.py
+│   │   │   └── race_replay.py
+│   │   ├── lib
+│   │   │   ├── season.py
+│   │   │   ├── settings.py
+│   │   │   ├── time.py
+│   │   │   └── tyres.py
+│   │   ├── services
+│   │   │   └── stream.py
+│   │   ├── bayesian_tyre_model.py
+│   │   ├── f1_data.py
+│   │   ├── run_session.py
+│   │   ├── tyre_degradation_integration.py
+│   │   └── ui_components.py
+│   ├── .gitattributes
+│   ├── .gitignore
+│   ├── README.md
+│   ├── contributors.md
+│   ├── main.py
+│   ├── requirements.txt
+│   ├── roadmap.md
+│   └── telemetry.md
+├── tmp_speechbrain
+│   ├── classifier.ckpt
+│   ├── custom.py
+│   ├── embedding_model.ckpt
+│   ├── hyperparams.yaml
+│   ├── label_encoder.ckpt
+│   └── mean_var_norm_emb.ckpt
+├── .cache
+├── Debug.py
+├── Enroll_Voice.py
+├── Launch.py
+├── Main.py
+├── README.md
+├── Requirements.txt
+├── Setup_JARVIS.bat
+├── build_jarvis.py
+├── check_mics.py
+├── convert_icon.py
+├── ffmpeg.exe
+├── package-lock.json
+├── package.json
+└── tree.py
