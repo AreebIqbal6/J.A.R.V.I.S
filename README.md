@@ -1,11 +1,10 @@
 # 🚀 PROJECT J.A.R.V.I.S. MARK III - DEPLOYMENT GUIDE
-Yo team,
 
-We are officially deploying Project J.A.R.V.I.S. Mark III. This isn't a basic chatbot you type into on a website. It’s a fully local, Phase 3 Autonomous AI Agent. It can see your screen, write and execute its own Python code, generate PowerPoint presentations, compile Excel spreadsheets, monitor your phone/emails in real-time, tap into NASA satellite telemetry, and hijack Smart TVs over the local network.
+Welcome to Project J.A.R.V.I.S. Mark III. This isn't a basic chatbot you type into on a website. It’s a fully local, Phase 3 Autonomous AI Agent. It can see your screen, write and execute its own Python code, generate PowerPoint presentations, compile Excel spreadsheets, monitor your phone/emails in real-time, tap into NASA satellite telemetry, and hijack Smart TVs over the local network.
 
 Since this runs natively on your actual hardware, you cannot just click an .exe and expect it to work. You need to build the engine first.
 
-Follow these exact steps, in order. If you skip a step, J.A.R.V.I.S. stays dead.
+Follow these exact steps, in order. If you skip a step, J.A.R.V.I.S. will not function.
 
 ## STEP 1: The Core Engine (Python)
 J.A.R.V.I.S. is built on a 100% pure-Python architecture.
@@ -31,7 +30,7 @@ Type this exact command and hit Enter:
 Let it download 100%. You can close the window when it's done.
 
 ## STEP 3: The .env File (The Brain Keys)
-J.A.R.V.I.S. needs API keys to communicate with his cloud brains (like Groq, Llama 3, and Picovoice), as well as your local IPs to control your hardware. Think of these as his passwords.
+J.A.R.V.I.S. needs API keys to communicate with cloud brains (like Groq, Llama 3, and Picovoice), as well as your local IPs to control your hardware. Think of these as its passwords.
 
 Go into the main J.A.R.V.I.S. project folder.
 
@@ -112,12 +111,12 @@ Inside the main project folder, find the file named `Setup_JARVIS.bat` (or `star
 
 Double-click it.
 
-A terminal window will open. It is going to build a secure virtual environment and install a ton of Python AI packages natively. This might take 5 to 10 minutes depending on your internet speed. Let it do its thing.
+A terminal window will open. It is going to build a secure virtual environment and install all required Python AI packages natively. This might take 5 to 10 minutes depending on your internet speed. Let it do its thing.
 
 When it finishes, the main J.A.R.V.I.S. interface will boot up.
 
-## STEP 5: How to Use Him
-Once the interface says "Available", you can talk to him or type. Don't just treat him like ChatGPT; treat him like an employee.
+## STEP 5: How to Use J.A.R.V.I.S.
+Once the interface says "Available", you can talk to him or type. Don't just treat him like a basic chatbot; treat him like an employee.
 
 **The Executive Suite:**
 
@@ -148,5 +147,3 @@ He runs silently in the background. Whenever someone texts your phone via WhatsA
 **The Interrupter:**
 
 If he is talking too much or playing music, just Clap your hands loudly near the microphone. He will instantly silence himself.
-
-**IN SHORT: TEST HIS LIMITS AND LET ME KNOW IF HE LACKS.**
