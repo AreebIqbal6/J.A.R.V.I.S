@@ -1,0 +1,50 @@
+# Environments
+.env
+.env.*
+.venv
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Keys and secrets
+*.key
+*.pem
+*.cert
+*.crt
+*.json.key
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# User Data / State
+Data/ChatLog.json
+Frontend/Files/*.data
+Workspace/Code/*
+
+# Editor/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
