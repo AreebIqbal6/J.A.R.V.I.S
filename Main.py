@@ -82,6 +82,13 @@ except Exception as e:
     print(f"!! Smart Home Offline: {e}")
     ControlTV = None
 
+try:
+    from Backend.SmartPlug import TuyaPlugControl
+    jarvis_plug = TuyaPlugControl()
+except Exception as e:
+    print(f"!! Smart Plug Offline: {e}")
+    jarvis_plug = None
+
 FEMALE_VIPS = ["Fariya", "Rija", "Fabha", "Yusma", "Farah"]
 
 # ==========================================
@@ -221,7 +228,7 @@ def MainExecution():
                     ShowTextToScreen(f"{Assistantname} : {ans}")
                     TextToSpeech(ans)
 
-        excluded = ["general", "realtime", "generate image", "vision screenshot", "vision camera", "exit", "sentry", "f1", "quant", "memory", "presentation", "excel", "database", "code", "tv", "nasa"]
+        excluded = ["general", "realtime", "generate image", "vision screenshot", "vision camera", "exit", "sentry", "f1", "quant", "memory", "presentation", "excel", "database", "code", "tv", "nasa", "hardware"]
         auto_queries = [q for q in Decision if any(q.startswith(f) for f in funcs if f not in excluded)]
         
         if any("sentry" in d for d in Decision):
@@ -327,6 +334,29 @@ def MainExecution():
                 ans = ControlTV(Query)
             else:
                 ans = f"The Smart TV module is currently offline, {salutation}."
+            ShowTextToScreen(f"{Assistantname} : {ans}")
+            TextToSpeech(ans)
+
+        elif any(i.startswith("hardware") for i in Decision):
+            hardware_decision = next(i for i in Decision if i.startswith("hardware"))
+            json_str = hardware_decision.replace("hardware", "", 1).strip()
+            
+            # THE PROOF FOR THE PROFESSOR:
+            print(f"\n[AI REASONING / FUNCTION CALL] -> {json_str}\n")
+            ShowTextToScreen(f"{Assistantname} : Synthesizing hardware command...")
+            
+            try:
+                payload = json.loads(json_str)
+                if payload.get("tool") == "smart_plug" and jarvis_plug:
+                    if payload.get("state") == "on":
+                        ans = asyncio.run(jarvis_plug.turn_on())
+                    else:
+                        ans = asyncio.run(jarvis_plug.turn_off())
+                else:
+                    ans = f"Tool {payload.get('tool')} not found or offline."
+            except Exception as e:
+                ans = f"Hardware execution failed: {e}"
+                
             ShowTextToScreen(f"{Assistantname} : {ans}")
             TextToSpeech(ans)
 

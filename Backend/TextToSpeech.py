@@ -21,6 +21,16 @@ os.makedirs(os.path.dirname(AUDIO_PATH), exist_ok=True)
 def contains_urdu(text):
     return bool(re.search(r'[\u0600-\u06FF]', text))
 
+# --- BARGE-IN INTERRUPTION ---
+def StopTTS():
+    """Instantly kills the currently playing TTS audio buffer."""
+    try:
+        if pygame.mixer.music.get_busy():
+            print(">> [BARGE-IN]: Interruption detected. Silencing audio buffer.")
+            pygame.mixer.music.stop()
+    except:
+        pass
+
 # --- OFFLINE FALLBACK ENGINE ---
 def SpeakOffline(Text):
     print(">> [TTS DEBUG]: Using Offline Fallback (pyttsx3)...")

@@ -278,6 +278,15 @@ class MainWindow(QMainWindow):
 
 def GraphicalUserInterface():
     from Frontend.WebGLMasterHUD import launch_webgl_hud
+    
+    # Fix black screen / WebGL crashes on Windows
+    sys.argv.append("--ignore-gpu-blocklist")
+    sys.argv.append("--enable-gpu-rasterization")
+    sys.argv.append("--enable-webgl")
+    sys.argv.append("--no-sandbox")
+    sys.argv.append("--disable-web-security")
+    sys.argv.append("--allow-file-access-from-files")
+    
     QApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
     app = QApplication.instance()
     if not app:

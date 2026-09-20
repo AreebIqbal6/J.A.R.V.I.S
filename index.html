@@ -9,7 +9,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
   :root{
     --cyan:#4dd8ff;
@@ -26,22 +25,6 @@
     --font-display:'Orbitron',sans-serif;
     --font-mono:'JetBrains Mono',monospace;
   }
-  
-  #hologram-container {
-    display: none;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60%;
-    height: 60%;
-    z-index: 1000;
-    border: 1px solid var(--cyan-dim);
-    box-shadow: 0 0 30px rgba(77,216,255,0.1);
-    background: rgba(0,0,0,0.8);
-    backdrop-filter: blur(5px);
-  }
-  
   *{box-sizing:border-box;}
   html,body{ margin:0; height:100%; background:#000; overflow:hidden; }
   body{ font-family:var(--font-mono); color:var(--text-hi); }
@@ -463,7 +446,6 @@
 </style>
 </head>
 <body>
-<div id="hologram-container"></div>
 <div class="app">
 
   <div class="shell-controls">
@@ -471,7 +453,6 @@
     <span class="sub-controls" id="vrSubControls" style="display:none">
       <button class="active" data-vrmode="schematic">Schematic</button>
       <button data-vrmode="map">Map</button>
-      <button data-vrmode="tracker">Tracker</button>
     </span>
     <button class="active" data-mode="widget">Widget</button>
     <button data-mode="vr">VR HUD</button>
@@ -511,7 +492,7 @@
         <div class="line user">Open the chat widget and also the music widget.</div>
         <div class="line assistant">Opening the chat. Opening the music widget.</div>
       </div>
-      <div class="chat-input-row"><input type="text" id="chatInput" placeholder="enter message..." /><button id="chatSendBtn">[send ⇧]</button></div>
+      <div class="chat-input-row"><input type="text" id="chatInput" placeholder="enter message..." /><button id="chatSendBtn">[send ↵]</button></div>
     </div>
 
     <div class="panel cam-panel" id="panelCam">
@@ -527,9 +508,9 @@
       <div class="music-body">
         <div class="album-art"></div>
         <div class="track-info">
-          <div class="track-title">Still Into You</div>
-          <div class="track-artist">Paramore</div>
-          <div class="track-progress"><div class="bar"><div class="fill"></div></div><div class="times"><span>2:04</span><span>3:36</span></div></div>
+          <div class="track-title" id="musicTitle">NO SIGNAL</div>
+          <div class="track-artist" id="musicArtist">SYSTEM IDLE</div>
+          <div class="track-progress"><div class="bar"><div class="fill" id="musicProgress"></div></div><div class="times"><span id="musicTime">0:00</span><span id="musicDuration">0:00</span></div></div>
           <div class="transport"><button>⏮</button><button class="play">▶</button><button>⏭</button><button>⟳</button></div>
         </div>
       </div>
@@ -756,14 +737,6 @@
     <div class="ruler-top"></div>
     <div class="ruler-left"></div>
 
-    <div class="vr-window" id="trackerWindow" style="opacity:0; pointer-events:none; z-index:5;">
-      <div class="win-titlebar"><span>? EARTH TRACKER — NASA EONET</span><span class="win-controls">- ? ?</span></div>
-      <div class="win-body" style="padding:0;">
-        <div id="trackerMap" style="width:100%; height:100%; background:#0a0d10;"></div>
-        <div id="trackerOfflineNote" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#ff5d6c; font-family:'Roboto Mono'; display:none; background:rgba(10,13,16,0.9); padding:10px; border:1px solid #ff5d6c;">TRACKER OFFLINE</div>
-      </div>
-    </div>
-
     <div class="vr-window" id="schematicWindow">
       <div class="win-titlebar"><span>▤ ESP32_TIMING_SCHEMATIC.PDF</span><span class="win-controls">— ▢ ✕</span></div>
       <div class="win-body">
@@ -889,19 +862,13 @@
 
   const schematicWindow = document.getElementById('schematicWindow');
   const mapView = document.getElementById('mapView');
-  const trackerWindow = document.getElementById('trackerWindow');
   document.querySelectorAll('#vrSubControls button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('#vrSubControls button').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
       const m = btn.dataset.vrmode;
-      
-      mapView.classList.remove('show');
-      schematicWindow.style.opacity = 0; schematicWindow.style.pointerEvents = 'none';
-      if(trackerWindow) { trackerWindow.style.opacity = 0; trackerWindow.style.pointerEvents = 'none'; }
-
       if(m==='map'){
-        mapView.classList.add('show');
+        mapView.classList.add('show'); schematicWindow.style.opacity=0; schematicWindow.style.pointerEvents='none';
         if(!mapEntered){
           mapEntered = true;
           initKarachiMap();
@@ -910,43 +877,9 @@
           setTimeout(()=>karachiMap && karachiMap.invalidateSize(), 50);
         }
       }
-      else if(m==='tracker'){
-        if(trackerWindow) { trackerWindow.style.opacity = 1; trackerWindow.style.pointerEvents = 'auto'; }
-        if(!trackerMapEntered){
-          trackerMapEntered = true;
-          initTrackerMap();
-        } else {
-          setTimeout(()=>trackerMap && trackerMap.invalidateSize(), 50);
-        }
-      }
-      else { 
-        schematicWindow.style.opacity=1; schematicWindow.style.pointerEvents='auto'; 
-      }
+      else{ mapView.classList.remove('show'); schematicWindow.style.opacity=1; schematicWindow.style.pointerEvents='auto'; }
     });
   });
-
-  /* ---------------- Earth Tracker Map ---------------- */
-  let trackerMapEntered = false;
-  let trackerMap = null;
-  let trackerMarkers = [];
-
-  function initTrackerMap(){
-    if(trackerMap || typeof L === 'undefined'){
-      if(typeof L === 'undefined') {
-        const errNote = document.getElementById('trackerOfflineNote');
-        if(errNote) errNote.style.display = 'block';
-      }
-      return;
-    }
-    try{
-      trackerMap = L.map('trackerMap', { zoomControl:false, attributionControl:false, worldCopyJump:true }).setView([20, 0], 2);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(trackerMap);
-      setTimeout(()=>trackerMap.invalidateSize(), 60);
-    }catch(e){
-      const errNote = document.getElementById('trackerOfflineNote');
-      if(errNote) errNote.style.display = 'block';
-    }
-  }
 
   /* ---------------- real map: Karachi, Pakistan (Leaflet + CARTO dark tiles) ---------------- */
   let mapEntered = false;
@@ -1017,227 +950,152 @@
   window.addEventListener('resize', placeTicks);
 
   /* ============================================================
-     JARVIS LIVE DATA ENGINE
-     All data is fetched from the FastAPI backend via WebSockets
-     ============================================================ */
-  const API = 'http://localhost:8000/api';
-  let ws;
-  let reconnectTimer;
-
-  function connectWebSocket() {
-    ws = new WebSocket('ws://localhost:8000/api/ws/hud');
-    
-    ws.onopen = () => {
-      console.log('JARVIS WebSocket connected.');
-      // Update UI offline states to online if needed
-      document.querySelectorAll('.panel').forEach(p => p.style.filter = 'none');
-      document.getElementById('clockDate').textContent = new Date().toDateString().toUpperCase();
-    };
-
-    ws.onclose = () => {
-      console.warn('JARVIS WebSocket disconnected. Reconnecting in 3s...');
-      document.querySelectorAll('.panel').forEach(p => p.style.filter = 'grayscale(0.6) brightness(0.6)');
-      clearTimeout(reconnectTimer);
-      reconnectTimer = setTimeout(connectWebSocket, 3000);
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const payload = JSON.parse(event.data);
-        handleSocketMessage(payload.type, payload.data);
-      } catch (e) {
-        console.error('Error parsing WS message:', e);
-      }
-    };
-  }
-
-  function handleSocketMessage(type, d) {
-    if (type === 'text_output') {
-      const chatLog = document.querySelector('.chat-log');
-      if(chatLog){
-        // d is a string: "User : Hello" or "JARVIS : Hi"
-        const isUser = d.startsWith("User") || d.toLowerCase().includes(" : ") === false;
-        const className = isUser ? 'user' : 'assistant';
-        chatLog.innerHTML += `<div class="line ${className}">${d}</div>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
-      }
-    }
-    else if (type === 'status_change') {
-      const statusLbl = document.querySelector('.status-text') || document.querySelector('.central-status') || document.getElementById('jarvisStatus');
-      if(statusLbl) statusLbl.textContent = d;
-      // In the mockup, there might not be a dedicated status label with these exact IDs, 
-      // but let's try to update any element that might represent the status.
-      // E.g., JARVIS LIVE text
-      const jLive = document.querySelector('.glitch');
-      if(jLive && d) jLive.textContent = `JARVIS: ${d.toUpperCase()}`;
-    }
-    else if (type === 'swarm_message') {
-      // d is {agent: "AGENT", message: "..."}
-      const chatLog = document.querySelector('.chat-log');
-      if(chatLog && d.message) {
-        chatLog.innerHTML += `<div class="line" style="color: #888; font-size: 0.9em; font-style: italic;">[${d.agent}] ${d.message}</div>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
-      }
-    }
-    else if (type === 'tts_waveform') {
-      // Not fully implemented in 2D UI, but we can flash a border
-      const p = document.getElementById('panelDynamic');
-      if(p) {
-        p.style.boxShadow = `0 0 ${d.intensity * 20}px rgba(0, 255, 255, 0.5)`;
-        setTimeout(() => { p.style.boxShadow = ''; }, 200);
-      }
-    }
-    else if (type === 'widget_command') {
-      if(d.action === "set_core_color") {
-        document.documentElement.style.setProperty('--color-primary', d.color);
-      }
-    }
-    else if (type === 'diagnostics') {
-      setGauge(gauges.cpu, d.cpu, '%');
-      setGauge(gauges.gpu, d.gpu, '%');
-      setGauge(gauges.ram, d.ram, '%');
-      const tempPct = Math.min(100, (d.core_temp / 100) * 100);
-      setGauge(gauges.temp, tempPct, '°C');
-      gauges.temp.querySelector('.gauge-value .num').textContent = Math.round(d.core_temp);
-      
-      netHistory.shift();
-      netHistory.push(d.net_down_mbps);
-      drawNet();
-      document.getElementById('netVal').textContent = `${d.net_down_mbps.toFixed(0)} Mb/s ↓ · ${d.net_up_mbps.toFixed(0)} Mb/s ↑`;
-    } 
-    else if (type === 'media') {
-      const titleEl = document.querySelector('.track-title');
-      const artistEl = document.querySelector('.track-artist');
-      const statusEl = document.querySelector('.music-status');
-      const fillEl = document.querySelector('.track-progress .fill');
-      const timesEl = document.querySelectorAll('.times span');
-      const playBtn = document.querySelector('.transport .play');
-
-      if(d.playing && titleEl){
-        titleEl.textContent = d.title || 'Unknown';
-        artistEl.textContent = d.artist || 'Unknown Artist';
-        statusEl.textContent = d.status === 'Playing' ? 'PLAYING' : (d.status || 'PAUSED');
-        if(d.duration_sec > 0){
-          const pct = (d.position_sec / d.duration_sec) * 100;
-          fillEl.style.width = pct + '%';
-          const fmtTime = (s) => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
-          if(timesEl.length >= 2){ timesEl[0].textContent = fmtTime(d.position_sec); timesEl[1].textContent = fmtTime(d.duration_sec); }
-        }
-        if(playBtn) playBtn.textContent = d.status === 'Playing' ? '⏸' : '▶';
-      } else if (titleEl) {
-        statusEl.textContent = 'NO MEDIA';
-      }
-    }
-    else if (type === 'crypto') {
-      if(d.price){
-        const obHead = document.querySelector('.ob-head');
-        if(obHead) obHead.textContent = `ORDER BOOK — ${d.symbol}`;
-        const obContainer = document.querySelector('[data-view="quant"] .orderbook');
-        if(obContainer && d.asks && d.bids){
-          let obHtml = `<div class="ob-head">ORDER BOOK — ${d.symbol}</div>`;
-          d.asks.slice(0,3).reverse().forEach(a => { obHtml += `<div class="ob-row ask"><span>${Math.round(a.price).toLocaleString()}</span><span>${a.qty.toFixed(3)}</span></div>`; });
-          d.bids.slice(0,3).forEach(b => { obHtml += `<div class="ob-row bid"><span>${Math.round(b.price).toLocaleString()}</span><span>${b.qty.toFixed(3)}</span></div>`; });
-          obContainer.innerHTML = obHtml;
-        }
-        const pnlRow = document.querySelector('.pnl-row');
-        if(pnlRow){
-          const dir = d.change_pct >= 0 ? 'up' : 'down';
-          const sign = d.change_pct >= 0 ? '+' : '';
-          pnlRow.innerHTML = `BTC/USDT · <b>$${Math.round(d.price).toLocaleString()}</b> · <span class="pnl-val ${dir}">${sign}${d.change_pct.toFixed(2)}% (24h)</span>`;
-        }
-      }
-    }
-    else if (type === 'f1_telemetry') {
-      if(document.getElementById('panelData').classList.contains('show')){
-        setRpm(d.rpm_pct);
-        document.getElementById('gearNum').textContent = d.gear;
-        document.getElementById('speedNum').textContent = d.speed;
-      }
-    }
-    else if (type === 'security_log') {
-      if(d.events && d.events.length > 0){
-        const secLog = document.querySelector('.sec-log');
-        if(secLog) secLog.innerHTML = d.events.map(ev => `<div class="sec-row${ev.warn ? ' warn' : ''}">${ev.time} — ${ev.warn ? '⚠ ' : ''}${ev.text}</div>`).join('');
-      }
-    }
-    else if (type === 'markets') {
-      if(d.tickers && d.tickers.length > 0){
-        document.querySelector('.ticker-bar').innerHTML = d.tickers.map(t => {
-          const dir = t.change_pct >= 0 ? 'up' : 'down';
-          const sign = t.change_pct >= 0 ? '+' : '';
-          return `<span>${t.name} <b>${t.value.toLocaleString()}</b> <span class="${dir}">${sign}${t.change_pct}%</span></span>`;
-        }).join('');
-      }
-    }
-    else if (type === 'briefing') {
-      const weather = d.weather || {};
-      const news = d.news || {};
-      const briefText = document.querySelector('.brief-text');
-      if(briefText){
-        let html = `<b>Good to see you, Sir.</b> I am online and ready.<br/>`;
-        if(weather.temp_c) html += `• Weather in ${weather.city}: ${weather.description}, ${weather.temp_c}°C (feels like ${weather.feels_like_c}°C).<br/>`;
-        if(news.headlines && news.headlines.length > 0){
-          html += `• <b>Top Headlines:</b><br/>`;
-          news.headlines.slice(0,3).forEach(h => html += `&nbsp;&nbsp;→ ${h.title}<br/>`);
-        }
-        briefText.innerHTML = html;
-      }
-      if(news.headlines && news.headlines.length > 0){
-        const breakingBar = document.querySelector('.breaking-bar');
-        if(breakingBar) breakingBar.textContent = news.headlines[0].title.toUpperCase();
-      }
-    }
-    else if (type === 'earth_tracker') {
-      if(trackerMap && d.events) {
-        trackerMarkers.forEach(m => trackerMap.removeLayer(m));
-        trackerMarkers = [];
-        d.events.forEach(ev => {
-          const icon = L.divIcon({
-            className:'', iconSize:[10,10], iconAnchor:[5,5],
-            html:`<div class="map-tag-icon selected" style="transform:translate(8px,-4px)"><span class="flight-marker" style="background:#ff5d6c;box-shadow:0 0 10px #ff5d6c"></span><span class="label" style="font-size:9px;color:#ff5d6c;white-space:nowrap;">${ev.title}</span></div>`
-          });
-          const m = L.marker([ev.lat, ev.lng], { icon }).addTo(trackerMap);
-          trackerMarkers.push(m);
-        });
-      }
-    }
-  }
-
-  // Connect on load
-  window.JARVIS_SOCKET = connectWebSocket;
-  connectWebSocket();
-
-  /* ============================================================
-     1. Diagnostics Helpers
+     1. Diagnostics — circular gauges + live network graph
      ============================================================ */
   const GAUGE_R = 42, GAUGE_C = 2 * Math.PI * GAUGE_R;
-  function setGauge(el, pct, suffix){
-    if(!el) return;
+  function setGauge(el, pct){
     const fill = el.querySelector('.gauge-fill');
     fill.style.strokeDasharray = `${GAUGE_C} ${GAUGE_C}`;
     fill.style.strokeDashoffset = GAUGE_C * (1 - pct/100);
     el.classList.toggle('warn', pct>=70 && pct<88);
     el.classList.toggle('crit', pct>=88);
     el.querySelector('.gauge-value .num').textContent = Math.round(pct);
-    if(suffix) el.querySelector('.gauge-value .pct').textContent = suffix;
   }
-  const gauges = { cpu: document.getElementById('gaugeCpu'), gpu: document.getElementById('gaugeGpu'), ram: document.getElementById('gaugeRam'), temp: document.getElementById('gaugeTemp') };
-  Object.values(gauges).forEach(g => { if(g) setGauge(g, parseFloat(g.dataset.pct)); });
-  
-  let netHistory = Array.from({length:30}, ()=>0);
+  const gauges = ['gaugeCpu','gaugeGpu','gaugeRam','gaugeTemp'].map(id=>document.getElementById(id));
+  gauges.forEach(g=>setGauge(g, parseFloat(g.dataset.pct)));
+
+  let netHistory = Array.from({length:30}, ()=>30+Math.random()*40);
   function drawNet(){
-    const w=300,h=44, maxVal = Math.max(1, ...netHistory), step = w/(netHistory.length-1);
-    const pts = netHistory.map((v,i)=>`${(i*step).toFixed(1)},${(h-(v/maxVal*h*0.9)).toFixed(1)}`);
+    const w=300,h=44;
+    const step = w/(netHistory.length-1);
+    const pts = netHistory.map((v,i)=>`${(i*step).toFixed(1)},${(h-(v/100*h)).toFixed(1)}`);
     document.getElementById('netLine').setAttribute('points', pts.join(' '));
     document.getElementById('netFill').setAttribute('points', `0,${h} `+pts.join(' ')+` ${w},${h}`);
   }
+  drawNet();
+
+  // Live WebSocket Telemetry & Chat Integration
+  const ws = new WebSocket(`ws://${window.location.host}/ws`);
+  
+  ws.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      
+      if (data.type === "telemetry") {
+        document.getElementById('gaugeCpu').dataset.pct = data.cpu;
+        document.getElementById('gaugeCpu').querySelector('.num').textContent = data.cpu;
+        document.getElementById('gaugeRam').dataset.pct = data.ram;
+        document.getElementById('gaugeRam').querySelector('.num').textContent = data.ram;
+        document.getElementById('gaugeTemp').dataset.pct = data.temp;
+        document.getElementById('gaugeTemp').querySelector('.num').textContent = data.temp;
+        document.getElementById('netVal').textContent = `${data.net_down} Mb/s ↓ · ${data.net_up} Mb/s ↑`;
+        
+        netHistory.shift();
+        netHistory.push(Math.max(5, Math.min(100, (data.net_down + data.net_up) / 2)));
+        drawNet();
+        
+        if (data.briefing) {
+          const bb = document.querySelector('.breaking-bar');
+          if (bb && data.briefing.news && data.briefing.news.length > 0) {
+            bb.textContent = data.briefing.news[0].toUpperCase();
+          }
+          const bt = document.querySelector('.brief-text');
+          if (bt) {
+            let newsHtml = data.briefing.news.map(n => `• ${n}<br/>`).join('');
+            bt.innerHTML = `<b>Live Briefing, Sir.</b><br/>• Weather: ${data.briefing.weather}<br/>${newsHtml}`;
+          }
+        }
+      }
+      else if (data.type === "chat_response" && data.content) {
+        const chatLog = document.querySelector('.chat-log');
+        if(chatLog){
+          chatLog.innerHTML += `<div class="line assistant">${data.content}</div>`;
+          chatLog.scrollTop = chatLog.scrollHeight;
+        }
+      }
+      else if (data.type === "chat_user" && data.content) {
+        const chatLog = document.querySelector('.chat-log');
+        if(chatLog){
+          chatLog.innerHTML += `<div class="line user">${data.content}</div>`;
+          chatLog.scrollTop = chatLog.scrollHeight;
+        }
+      }
+      else if (data.type === "media" && data.data) {
+        if(data.data.playing) {
+          document.getElementById('musicTitle').textContent = data.data.title;
+          document.getElementById('musicArtist').textContent = data.data.artist;
+        } else {
+          document.getElementById('musicTitle').textContent = "NO SIGNAL";
+          document.getElementById('musicArtist').textContent = "SYSTEM IDLE";
+        }
+      }
+      else if (data.type === "crypto" && data.data) {
+        document.querySelector('.pnl-val').textContent = `${data.data.price} (${data.data.change_pct}%)`;
+      }
+      else if (data.type === "f1_telemetry" && data.data) {
+        setRpm(data.data.rpm_pct);
+        document.getElementById('gearNum').textContent = data.data.gear;
+        document.getElementById('speedNum').textContent = data.data.speed;
+      }
+      else if (data.type === "security_log" && data.data.events) {
+        const secLog = document.querySelector('.sec-log');
+        if (secLog) {
+          secLog.innerHTML = data.data.events.map(ev => 
+            `<div class="sec-row ${ev.warn ? 'warn' : ''}">${ev.time} — ${ev.text}</div>`
+          ).join('');
+        }
+      }
+      else if (data.type === "code_result" && data.data) {
+        const tb = document.querySelector('.term-body');
+        if (tb) {
+          let content = data.data.stdout || "";
+          if (data.data.stderr) content += "\n[ERROR]: " + data.data.stderr;
+          tb.innerHTML = `<pre style="color:var(--text-main);font-family:monospace;white-space:pre-wrap;font-size:12px;margin:0;">${content}</pre>`;
+        }
+        const cs = document.getElementById('coderStatus');
+        if (cs) {
+          cs.textContent = data.data.success ? "EXECUTION COMPLETE [0]" : "EXECUTION FAILED [1]";
+          cs.style.color = data.data.success ? "var(--color-acc2)" : "var(--color-acc1)";
+        }
+      }
+    } catch (e) {
+      console.error("Error parsing WebSocket message:", e);
+    }
+  };
+
+  const chatInput = document.getElementById('chatInput');
+  const chatSendBtn = document.getElementById('chatSendBtn');
+  if(chatInput && chatSendBtn) {
+    const sendMsg = () => {
+      const text = chatInput.value.trim();
+      if(!text) return;
+      chatInput.value = '';
+      
+      const chatLog = document.querySelector('.chat-log');
+      if(chatLog){
+        chatLog.innerHTML += `<div class="line user">${text}</div>`;
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+      
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "chat", query: text }));
+      }
+    };
+    
+    chatSendBtn.addEventListener('click', sendMsg);
+    chatInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMsg(); });
+  }
 
   /* ============================================================
-     2. Smart Home
+     2. Smart Home — OS Control Mappings
      ============================================================ */
-  document.querySelectorAll('.toggle').forEach(t=>{
-    t.addEventListener('click', ()=>t.classList.toggle('on')); // Keep optimistic UI
+  const homeToggles = document.querySelectorAll('.toggle-row');
+  homeToggles.forEach((row, i) => {
+    // We restore toggles just for visual UI as per original design constraint
+    const btn = row.querySelector('.toggle');
+    btn.addEventListener('click', () => btn.classList.toggle('on'));
   });
+  
   const THERMO_R = 50, THERMO_C = 2*Math.PI*THERMO_R;
   let thermoTemp = 23;
   function drawThermo(){
@@ -1248,15 +1106,21 @@
     document.getElementById('thermoTemp').textContent = thermoTemp+'°';
   }
   drawThermo();
+  
+  // Hook the .thermo-btns to send os_control for vol_up / vol_down
   document.querySelectorAll('.thermo-btns button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      thermoTemp = Math.max(16, Math.min(30, thermoTemp + parseInt(btn.dataset.delta,10)));
+      const delta = parseInt(btn.dataset.delta, 10);
+      thermoTemp = Math.max(16, Math.min(30, thermoTemp + delta));
       drawThermo();
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "os_control", action: delta > 0 ? "vol_up" : "vol_down" }));
+      }
     });
   });
 
   /* ============================================================
-     3. F1 Helpers & Candlestick
+     3. Data streams — F1 telemetry + market candlesticks
      ============================================================ */
   document.querySelectorAll('.data-tab').forEach(tab=>{
     tab.addEventListener('click', ()=>{
@@ -1270,25 +1134,31 @@
   for(let i=0;i<RPM_SEGS;i++){ const s=document.createElement('div'); s.className='rpm-seg'; rpmBar.appendChild(s); }
   function setRpm(pct){
     const segs = rpmBar.children;
-    const active = Math.floor((pct/100) * RPM_SEGS);
-    for(let i=0; i<RPM_SEGS; i++){
-      segs[i].className = 'rpm-seg';
-      if(i < active){
-        segs[i].classList.add('on');
+    const lit = Math.round(pct/100*RPM_SEGS);
+    for(let i=0;i<segs.length;i++){
+      segs[i].classList.remove('lit','hi','max');
+      if(i<lit){
+        segs[i].classList.add('lit');
         if(i > RPM_SEGS*0.85) segs[i].classList.add('max');
         else if(i > RPM_SEGS*0.65) segs[i].classList.add('hi');
       }
     }
   }
+  let rpmPct = 72;
+  setRpm(rpmPct);
 
   function drawCandles(){
     const svg = document.getElementById('candleSvg');
-    if(!svg || svg.childElementCount) return; // Only draw once
+    if(!svg || svg.childElementCount) return;
     let price = 40, html = '';
     for(let i=0;i<24;i++){
-      const open = price, close = open + (Math.random()-0.5)*10;
-      const high = Math.max(open,close) + Math.random()*4, low = Math.min(open,close) - Math.random()*4;
-      const x = i*9 + 4, up = close >= open, color = up ? '#3fe08a' : '#ff5d6c';
+      const open = price;
+      const close = open + (Math.random()-0.5)*10;
+      const high = Math.max(open,close) + Math.random()*4;
+      const low = Math.min(open,close) - Math.random()*4;
+      const x = i*9 + 4;
+      const up = close >= open;
+      const color = up ? '#3fe08a' : '#ff5d6c';
       html += `<line x1="${x}" y1="${80-high}" x2="${x}" y2="${80-low}" stroke="${color}" stroke-width="1"/>`;
       html += `<rect x="${x-2.5}" y="${80-Math.max(open,close)}" width="5" height="${Math.max(1,Math.abs(open-close))}" fill="${color}"/>`;
       price = close;
@@ -1298,156 +1168,96 @@
   drawCandles();
 
   /* ============================================================
-     4. Camera — getUserMedia
+     4. Security — biometric scan status cycling
      ============================================================ */
-  (async function initCamera(){
-    const camFeed = document.querySelector('.cam-feed');
-    if(!camFeed) return;
-    try{
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 180 } });
-      const video = document.createElement('video');
-      video.srcObject = stream;
-      video.autoplay = true;
-      video.muted = true;
-      video.playsInline = true;
-      video.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;filter:brightness(0.85) contrast(1.1) saturate(0.8);';
-      const camTag = camFeed.querySelector('.cam-tag');
-      camFeed.insertBefore(video, camTag);
-      if(camTag) camTag.textContent = 'LIVE FEED — WEBCAM ACTIVE';
-    }catch(e){
-      console.warn('Camera access denied or unavailable:', e);
-    }
-  })();
+  const scanStates = ['SCANNING RETINA…','ANALYZING PATTERN…','CROSS-REFERENCING…','IDENTITY CONFIRMED ✓'];
+  let scanIdx = 0;
+  setInterval(()=>{
+    if(!document.getElementById('panelSecurity').classList.contains('show')) return;
+    scanIdx = (scanIdx+1) % scanStates.length;
+    document.getElementById('scanStatus').textContent = scanStates[scanIdx];
+  }, 1500);
 
   /* ============================================================
-     5. Dynamic fallback panel API & Chat logic
+     6. Coder / Sandbox — build progress loop
+     ============================================================ */
+  let coderPct = 0;
+  setInterval(()=>{
+    if(!document.getElementById('panelCoder').classList.contains('show')) return;
+    coderPct += 4;
+    const status = document.getElementById('coderStatus');
+    const fill = document.getElementById('coderProgress');
+    if(coderPct >= 100){
+      coderPct = 0;
+      fill.style.width = '100%';
+      status.textContent = 'BUILD COMPLETE ✓ — 0 errors, 0 warnings';
+      setTimeout(()=>{ fill.style.width='0%'; status.textContent='RUNNING sandbox_run.py …'; }, 900);
+    } else {
+      fill.style.width = coderPct+'%';
+    }
+  }, 180);
+
+  /* ============================================================
+     7. Dynamic fallback panel — public API for backend results
      ============================================================ */
   window.JARVIS = window.JARVIS || {};
   window.JARVIS.showDynamicResult = function(title, html){
     const tab = document.querySelector('#panelDynamic .panel-tab');
-    if(tab) tab.innerHTML = '<span class="sq"></span>' + (title || '[DYNAMIC_QUERY_RESULT]');
-    const body = document.getElementById('dynamicBody');
-    if(body) body.innerHTML = html || ''; // Backend should sanitize this
+    tab.innerHTML = '<span class="sq"></span>' + (title || '[DYNAMIC_QUERY_RESULT]');
+    document.getElementById('dynamicBody').innerHTML = html || '';
     revealDockPage('dynamic');
     setMode('dynamic');
-  };
-
-  const chatInput = document.getElementById('chatInput');
-  const chatSendBtn = document.getElementById('chatSendBtn');
-  if(chatInput && chatSendBtn) {
-    const sendMsg = async () => {
-      const text = chatInput.value.trim();
-      if(!text) return;
-      chatInput.value = '';
-      
-      const chatLog = document.querySelector('.chat-log');
-      if(chatLog){
-        chatLog.innerHTML += `<div class="line user">${text}</div>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
-      }
-      
-      try {
-        const res = await fetch(`${API}/chat`, {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({text: text})
-        });
-        const data = await res.json();
-        
-        if(chatLog){
-          chatLog.innerHTML += `<div class="line assistant">${data.text}</div>`;
-          chatLog.scrollTop = chatLog.scrollHeight;
-        }
-        
-        // Show dynamic result panel
-        if(data.dynamic_result){
-          window.JARVIS.showDynamicResult(data.dynamic_result.title, data.dynamic_result.html);
-        }
-        
-        // Hologram Logic
-        if(data.text.toLowerCase().includes("hologram") || data.text.toLowerCase().includes("visualize")){
-          if(window.JARVIS.toggleHologram) window.JARVIS.toggleHologram(true);
-        } else {
-          if(window.JARVIS.toggleHologram) window.JARVIS.toggleHologram(false);
-        }
-      } catch (err) {
-        console.error("Chat error:", err);
-      }
-    };
-    
-    chatSendBtn.addEventListener('click', sendMsg);
-    chatInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMsg(); });
-  }
+  }, 100);
 
   /* ============================================================
-     6. Hologram Renderer (Three.js)
+     9. Native Web Speech API (Hands-Free Voice Input)
      ============================================================ */
-  let hologramActive = false;
-  let holoScene, holoCamera, holoRenderer, holoCube;
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  function initHologram() {
-    const container = document.getElementById('hologram-container');
-    if (!container) return;
-    
-    // Setup Scene
-    holoScene = new THREE.Scene();
-    holoCamera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
-    holoCamera.position.z = 5;
-    
-    holoRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    holoRenderer.setSize(container.clientWidth, container.clientHeight);
-    container.appendChild(holoRenderer.domElement);
-    
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    holoScene.add(ambientLight);
-    const pointLight = new THREE.PointLight(0x00ffff, 1);
-    pointLight.position.set(10, 10, 10);
-    holoScene.add(pointLight);
-    
-    // Geometry
-    const geometry = new THREE.BoxGeometry(2, 2, 2);
-    const material = new THREE.MeshStandardMaterial({
-      color: 0x00ffff,
-      emissive: 0x00ffff,
-      emissiveIntensity: 0.5,
-      wireframe: true
-    });
-    holoCube = new THREE.Mesh(geometry, material);
-    holoScene.add(holoCube);
-    
-    // Resize Listener
-    window.addEventListener('resize', () => {
-      if(hologramActive && container) {
-        holoCamera.aspect = container.clientWidth / container.clientHeight;
-        holoCamera.updateProjectionMatrix();
-        holoRenderer.setSize(container.clientWidth, container.clientHeight);
+  if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    // Make the HUD Central Orb trigger voice listening when clicked
+    const homeOrb = document.getElementById('homeOrb');
+    if (homeOrb) {
+      homeOrb.style.cursor = 'pointer';
+      homeOrb.addEventListener('click', () => {
+        recognition.start();
+        const statusText = document.querySelector('.orb-text');
+        if (statusText) statusText.textContent = "LISTENING...";
+      });
+    }
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      console.log(">> [VOICE INPUT]:", transcript);
+
+      // Populate Input Box & Transmit over WebSocket
+      const chatInput = document.getElementById('chatInput');
+      if (chatInput) {
+        chatInput.value = transcript;
+        if (document.getElementById('chatSendBtn')) {
+          document.getElementById('chatSendBtn').click(); // Triggers existing WS send function
+        }
       }
-    });
-    
-    animateHologram();
-  }
+    };
 
-  function animateHologram() {
-    requestAnimationFrame(animateHologram);
-    if(hologramActive && holoCube) {
-      holoCube.rotation.x += 0.01;
-      holoCube.rotation.y += 0.01;
-      holoRenderer.render(holoScene, holoCamera);
-    }
-  }
-  
-  function toggleHologram(show) {
-    const container = document.getElementById('hologram-container');
-    if(!container) return;
-    hologramActive = show;
-    container.style.display = show ? 'block' : 'none';
-    if(show && !holoRenderer) {
-      initHologram();
-    }
-  }
+    recognition.onend = () => {
+      const statusText = document.querySelector('.orb-text');
+      if (statusText) statusText.textContent = "JARVIS";
+    };
 
-  window.JARVIS.toggleHologram = toggleHologram;
+    recognition.onerror = (err) => {
+      console.error("!! [SPEECH RECOGNITION ERROR]:", err);
+      const statusText = document.querySelector('.orb-text');
+      if (statusText) statusText.textContent = "JARVIS";
+    };
+  } else {
+    console.warn("!! Web Speech API not supported on this browser.");
+  }
 </script>
 </body>
 </html>

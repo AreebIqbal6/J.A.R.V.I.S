@@ -86,59 +86,9 @@ class WebGLMasterHUD(QMainWindow):
         self.web_view.load(QUrl.fromLocalFile(html_path))
         layout.addWidget(self.web_view)
 
-        # Subscribe to EventBus events
-        event_bus.subscribe("tts_waveform", self.on_tts_waveform)
-        event_bus.subscribe("swarm_message", self.on_swarm_message)
-        event_bus.subscribe("widget_command", self.on_widget_command)
-        event_bus.subscribe("status_change", self.on_status_change)
-        event_bus.subscribe("text_output", self.on_text_output)
-
-        # Network speed tracking variables
-        self.last_net_time = time.time()
-        self.last_net_bytes = psutil.net_io_counters() if HAS_PSUTIL else None
-
-        # Lightweight telemetry timer (2s interval — no process scanning)
-        self.telemetry_timer = QTimer(self)
-        self.telemetry_timer.timeout.connect(self.stream_real_telemetry)
-        self.telemetry_timer.start(2000)
-
-    def stream_real_telemetry(self):
-        """Lightweight telemetry — only sends what the HUD actually displays."""
-        try:
-            data = {"timestamp": time.strftime("%H:%M")}
-            json_str = json.dumps(data)
-            self.web_view.page().runJavaScript(f"if(window.updateRealtimeTelemetry) window.updateRealtimeTelemetry({json_str});")
-        except Exception:
-            pass
-
-    def on_tts_waveform(self, data: dict):
-        """Triggers JS Three.js shader scale and pulsing when JARVIS speaks."""
-        intensity = data.get("intensity", 0.5)
-        self.web_view.page().runJavaScript(f"if(window.syncAudioWaveform) window.syncAudioWaveform({intensity});")
-
-    def on_swarm_message(self, data: dict):
-        """Streams real agentic reasoning logs to the live execution feed."""
-        agent = data.get("agent", "AGENT")
-        msg = data.get("message", "")
-        json_str = json.dumps({"agent": agent, "message": msg})
-        self.web_view.page().runJavaScript(f"if(window.addExecutionLog) window.addExecutionLog({json_str});")
-
-    def on_widget_command(self, data: dict):
-        """Handles visual commands like changing colors or toggling HUD overlays."""
-        action = data.get("action", "")
-        if action == "set_core_color":
-            color = data.get("color", "#ffbc00")
-            self.web_view.page().runJavaScript(f"if(window.setThemeColor) window.setThemeColor('{color}');")
-
-    def on_status_change(self, payload):
-        status = str(payload).replace("'", "\\'")
-        self.web_view.page().runJavaScript(f"if(window.jarvisSetStatus) window.jarvisSetStatus('{status}');")
-
-    def on_text_output(self, payload):
-        text = str(payload)
-        t_type = "user" if text.startswith("User") or text.startswith(os.environ.get("Username", "User")) else "sys"
-        json_str = json.dumps(text)
-        self.web_view.page().runJavaScript(f"if(window.jarvisAddChat) window.jarvisAddChat({json_str}, '{t_type}');")
+        # Subscribing to EventBus is no longer necessary as all real-time events
+        # are now automatically routed through the FastAPI WebSocket in real_data.py
+        # and natively handled by hud_index.html.
 
 
 def launch_webgl_hud():

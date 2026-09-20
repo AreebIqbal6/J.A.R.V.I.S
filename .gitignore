@@ -50,3 +50,9 @@ Workspace/Code/*
 Thumbs.db
 
 node_modules/
+
+# Extra untracked/cache files
+Data/
+temp_voice.wav
+.cache/
+*.log

@@ -82,4 +82,11 @@ pyinstaller
 setuptools
 arcade
 PySide6
-questionaryPyQtWebEngine
+questionary
+PyQtWebEngine
+
+# --- FastAPI & Backend (Mark IV Architecture) ---
+fastapi
+uvicorn
+websockets
+paho-mqtt

@@ -93,6 +93,13 @@ def SpeechRecognition():
             try:
                 audio_data = recognizer.listen(source, timeout=10, phrase_time_limit=12)
                 
+                # --- FULL-DUPLEX BARGE-IN INTERRUPTION ---
+                try:
+                    from Backend.TextToSpeech import StopTTS
+                    StopTTS()
+                except Exception as e:
+                    pass
+                
                 SetAssistantStatus("Processing...")
                 print("\r>> Transcribing (Groq LPU)...   ", end="", flush=True)
 
@@ -100,18 +107,21 @@ def SpeechRecognition():
                 with open(temp_file, "wb") as f:
                     f.write(audio_data.get_wav_data())
 
-                # --- GROQ WHISPER API CALL ---
                 with open(temp_file, "rb") as audio_file:
                     transcription = groq_client.audio.transcriptions.create(
                         file=(temp_file, audio_file.read()),
                         model="whisper-large-v3",
-                        response_format="text",
-                        prompt="Jarvis. Open Notepad. Jarvis, what is the weather today? Calculate the numbers."
+                        response_format="text"
                     )
                 
-                text = str(transcription)
+                text = str(transcription).strip()
 
-                if not text or len(text.strip()) < 2:
+                if not text or len(text) < 2:
+                    return ""
+                
+                # Filter out Whisper silence hallucinations
+                lower_text = text.lower().replace(".", "").replace(",", "").strip()
+                if lower_text in ["thank you", "jarvis", "in order to", "thanks", "you", "open notepad"]:
                     return ""
 
                 print(f"\r>> User said: {text}           ")

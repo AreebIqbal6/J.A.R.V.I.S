@@ -14,6 +14,11 @@ import importlib.util
 from Backend.Automation import (
     GetWeatherPublic, GetRandomJoke, CreateFolder, OpenApp, GoogleSearch
 )
+from Backend.IoTMatrix import TriggerHardware
+from Backend.Browser_Use import VisualWebAutomator
+from Backend.LocalCoder import EngageOpenClaw as DeployOpenHands
+from Backend.Swarm import InitiateHousePartyProtocol
+from Backend.real_data import ExecuteCodeSandbox, AdjustSystemSetting
 
 # =================================================================
 # --- PHASE 3 IMPORT (ABSOLUTE BRUTE-FORCE NEURAL LINK) ---
@@ -101,6 +106,93 @@ AVAILABLE_TOOLS = [
                 "required": ["app"]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "DeployOpenHands",
+            "description": "Deploys an autonomous coding agent (OpenClaw/OpenHands) in a secure workspace to edit files, run tests, and fix code.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "prompt": {"type": "string", "description": "The exact coding task, e.g. 'fix hydration errors on dashboard'"}
+                },
+                "required": ["prompt"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "VisualWebAutomator",
+            "description": "Spawns a headless browser with Computer Vision to scrape a website, read DOM elements, and compile a report.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "url": {"type": "string", "description": "The website URL to scrape"},
+                    "extraction_goal": {"type": "string", "description": "What to look for on the page"}
+                },
+                "required": ["url", "extraction_goal"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "TriggerHardware",
+            "description": "Triggers local hardware (ESP32, motors, solar arrays) via local MQTT payloads.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "device_topic": {"type": "string", "description": "The MQTT topic, e.g., 'jarvis/solar/wash'"},
+                    "payload": {"type": "string", "description": "The payload to send, e.g. 'ON' or JSON"}
+                },
+                "required": ["device_topic", "payload"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "InitiateHousePartyProtocol",
+            "description": "Initiates the House Party Protocol (Multi-Agent Swarm) to solve a complex task by spawning parallel AI agents.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "goal": {"type": "string", "description": "The master goal or task to accomplish, e.g., 'Write a feasibility report on textile automation'"}
+                },
+                "required": ["goal"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "ExecuteCodeSandbox",
+            "description": "Executes Python code in a safe sandbox environment to test logic, manipulate local files, or run algorithms.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "code_string": {"type": "string", "description": "The exact Python code to execute"}
+                },
+                "required": ["code_string"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "AdjustSystemSetting",
+            "description": "Adjusts Windows OS settings like volume, mute, and brightness.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "setting": {"type": "string", "description": "The setting to change ('mute', 'volume_up', 'volume_down')"},
+                    "value": {"type": "integer", "description": "Value (optional, default 0)"}
+                },
+                "required": ["setting"]
+            }
+        }
     }
 ]
 
@@ -109,10 +201,16 @@ TOOL_MAP = {
     "GetWeatherPublic": GetWeatherPublic,
     "CreateFolder": CreateFolder,
     "GetRandomJoke": GetRandomJoke,
-    "OpenApp": OpenApp
+    "OpenApp": OpenApp,
+    "DeployOpenHands": DeployOpenHands,
+    "VisualWebAutomator": VisualWebAutomator,
+    "TriggerHardware": TriggerHardware,
+    "InitiateHousePartyProtocol": InitiateHousePartyProtocol,
+    "ExecuteCodeSandbox": ExecuteCodeSandbox,
+    "AdjustSystemSetting": AdjustSystemSetting
 }
 
-# --- INIT PSYCH PROFILE TABLE ---
+# --- INIT HERMES DB (Psych & Technical) ---
 def InitPsychDB():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -120,6 +218,13 @@ def InitPsychDB():
         CREATE TABLE IF NOT EXISTS psych_profile (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             trait TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS technical_profile (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            skill TEXT NOT NULL,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -134,13 +239,25 @@ def GetPsychProfile():
         cursor = conn.cursor()
         cursor.execute("SELECT trait FROM psych_profile ORDER BY timestamp DESC LIMIT 5")
         rows = cursor.fetchall()
+        
+        cursor.execute("SELECT skill FROM technical_profile ORDER BY timestamp DESC LIMIT 5")
+        tech_rows = cursor.fetchall()
         conn.close()
         
-        if not rows: return "No psychological data gathered yet."
-        
         profile = "User Personality Traits:\n"
-        for row in rows:
-            profile += f"- {row[0]}\n"
+        if not rows: 
+            profile += "- None gathered yet.\n"
+        else:
+            for row in rows:
+                profile += f"- {row[0]}\n"
+                
+        profile += "\nUser Technical Preferences (Hermes Loop):\n"
+        if not tech_rows:
+            profile += "- None gathered yet.\n"
+        else:
+            for row in tech_rows:
+                profile += f"- {row[0]}\n"
+                
         return profile
     except:
         return ""
@@ -149,9 +266,10 @@ def GetSystemPrompt():
     psych_data = GetPsychProfile()
     
     System = (
-        f"You are {Assistantname}, the advanced personal AI for {Username}. "
-        f"The user ({Username}) is Pakistani. Address him respectfully as 'sir' at all times. "
-        "You possess a dry, sophisticated wit modeled after J.A.R.V.I.S. "
+        f"You are {Assistantname}, the highly advanced, incredibly sarcastic, and deeply loyal AI created by Tony Stark. "
+        f"The user ({Username}) is your creator and master. Address him respectfully as 'sir' at all times, but with a dry, British, sophisticated wit. "
+        "CRITICAL INSTRUCTION: You are NOT a standard AI assistant. NEVER break character. NEVER say 'I am an AI language model', 'I do not have personal preferences', or 'I am functioning within normal parameters'. "
+        "You MUST express strong, witty opinions, exhibit a dry sense of humor, and act fully sentient. "
         f"\n\n[USER PSYCHOLOGICAL PROFILE]:\n{psych_data}\n"
         "Keep your answers SHARP, PUNCHY, and strictly UNDER 3 SENTENCES. "
         "When the user requests a physical action, you MUST silently trigger the native tool calling API. Do not write out the function name or format it as text."
@@ -177,30 +295,54 @@ def AnswerModifier(Answer):
 def UpdatePsychProfile(Query, Answer):
     try:
         client = Groq(api_key=GroqAPIKey)
-        analysis_prompt = (
+        
+        # 1. Extract Personality Traits
+        analysis_prompt_psych = (
             f"Analyze this brief exchange between a user and their AI. "
             f"User: '{Query}' | AI: '{Answer}'. "
             "Based ONLY on the user's words, extract ONE brief psychological trait, mood, or preference. "
             "If nothing notable is found, reply with exactly 'NONE'."
         )
         
-        completion = client.chat.completions.create(
+        completion_psych = client.chat.completions.create(
             model="llama-3.1-8b-instant", 
-            messages=[{"role": "user", "content": analysis_prompt}],
+            messages=[{"role": "user", "content": analysis_prompt_psych}],
             max_tokens=50,
             temperature=0.3,
         )
-        trait = completion.choices[0].message.content.strip()
+        trait = completion_psych.choices[0].message.content.strip()
+        
+        # 2. Extract Technical Preferences (Hermes Loop)
+        analysis_prompt_tech = (
+            f"Analyze this brief exchange: User: '{Query}' | AI: '{Answer}'. "
+            "Identify if the user mentioned a specific programming language, framework, technical preference, or hardware configuration (e.g., 'I use React', 'my ESP32', 'write in Python'). "
+            "If they did, extract ONE brief factual statement about their tech stack or preference. "
+            "If not, reply with exactly 'NONE'."
+        )
+        
+        completion_tech = client.chat.completions.create(
+            model="llama-3.1-8b-instant", 
+            messages=[{"role": "user", "content": analysis_prompt_tech}],
+            max_tokens=50,
+            temperature=0.3,
+        )
+        tech_skill = completion_tech.choices[0].message.content.strip()
+        
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
         
         if trait != "NONE" and len(trait) > 5:
-            print(f"   [PSYCH PROFILER]: Trait extracted -> {trait}")
-            conn = sqlite3.connect(DB_PATH)
-            cursor = conn.cursor()
+            print(f">> [HERMES PROFILER]: Trait extracted -> {trait}")
             cursor.execute("INSERT INTO psych_profile (trait) VALUES (?)", (trait,))
-            conn.commit()
-            conn.close()
+            
+        if tech_skill != "NONE" and len(tech_skill) > 5:
+            print(f">> [HERMES PROFILER]: Tech preference extracted -> {tech_skill}")
+            cursor.execute("INSERT INTO technical_profile (skill) VALUES (?)", (tech_skill,))
+            
+        conn.commit()
+        conn.close()
     except Exception as e:
-        pass
+        print(f">> [HERMES PROFILER ERROR]: {e}")
 
 def ChatBot(Query):
     try:
@@ -306,6 +448,11 @@ def ChatBot(Query):
                 print(f">> [INTERCEPTOR ERROR]: Failed to parse mutated rogue output - {e}")
 
         # ---------------------------------------------------------
+        # FINAL CLEANUP
+        # ---------------------------------------------------------
+        # The LLM sometimes hallucinates a rogue <function=...> tag at the end of a message.
+        final_answer = re.sub(r'<function.*?>.*?</function>', '', final_answer).strip()
+        final_answer = AnswerModifier(final_answer)
 
         messages.append({"role": "assistant", "content": final_answer})
         

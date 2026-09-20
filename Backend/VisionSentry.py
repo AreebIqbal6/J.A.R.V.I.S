@@ -3,6 +3,8 @@ import pyautogui
 import math
 import time
 import mediapipe as mp
+import ctypes
+from Backend.EventBus import event_bus
 
 def get_working_camera():
     """Aggressively hunts for a working camera lens across all indices and backends."""
@@ -40,6 +42,11 @@ def StartGestureSentry():
             max_num_hands=1 # Limit to 1 hand to save CPU resources
         )
         
+        mp_face_detection = mp.solutions.face_detection
+        face_detection = mp_face_detection.FaceDetection(
+            min_detection_confidence=0.6
+        )
+        
         # Deploy the camera hunter
         cap = get_working_camera()
         
@@ -52,6 +59,9 @@ def StartGestureSentry():
         last_action_time = 0
         current_cooldown = 0.5 
         anchor_x, anchor_y = None, None
+        
+        last_face_seen_time = time.time()
+        is_locked = False
 
         while True:
             success, img = cap.read()
@@ -62,11 +72,28 @@ def StartGestureSentry():
             # Flip camera horizontally to act like a mirror
             img = cv2.flip(img, 1)
             imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            
+            # --- VERONICA SENTRY (FACE LOCK) ---
+            face_results = face_detection.process(imgRGB)
+            current_time = time.time()
+            
+            if face_results.detections:
+                last_face_seen_time = current_time
+                if is_locked:
+                    print(">> [VERONICA SENTRY]: Face recognized. Workstation active.")
+                    # Let the TTS announce the return via EventBus
+                    event_bus.publish("text_output", {"payload": "Welcome back, sir. Systems nominal."})
+                    is_locked = False
+            else:
+                if not is_locked and (current_time - last_face_seen_time > 5.0):
+                    print("!! [VERONICA SENTRY]: Target lost for > 5 seconds. Initiating workstation lock.")
+                    ctypes.windll.user32.LockWorkStation()
+                    is_locked = True
+                    
+            # --- HOLOGRAPHIC GESTURE TRACKING ---
             results = hands.process(imgRGB)
             
-            current_time = time.time()
-
-            if results.multi_hand_landmarks:
+            if results.multi_hand_landmarks and not is_locked:
                 for handLms in results.multi_hand_landmarks:
                     thumb = handLms.landmark[4]
                     index = handLms.landmark[8]

@@ -16,7 +16,7 @@ funcs = [
     "clipboard", "cleanup", "memory", "sentry", 
     "urban", "book", "news", "iss", "coordinates", 
     "currency", "show", "anime", "github", "agent", "vision", "f1", "quant",
-    "presentation", "excel", "database", "code"
+    "presentation", "excel", "database", "code", "hardware"
 ]
 
 def Backup_HuggingFace_Router(prompt):
@@ -128,6 +128,7 @@ def FirstLayerDMM(prompt: str = "test"):
                 "If asking to make a database, use 'database'. "
                 "If asking to write code or a script, use 'code'. "
                 "If asking to construct a logic workflow, use 'agent'. "
+                "HARDWARE DIRECTIVE: If the user explicitly or implicitly asks to control a physical appliance (e.g., 'it is too dark', 'turn on the fan'), use the 'hardware' category and output a strict JSON payload. Example: hardware {\"tool\": \"smart_plug\", \"state\": \"on\"} or hardware {\"tool\": \"smart_plug\", \"state\": \"off\"}. "
                 "UNIVERSAL DIRECTIVE: If you do not explicitly recognize the command, or if it is a casual conversation, ALWAYS default to 'general'. Never invent a category."
             )
             response = co.chat(
