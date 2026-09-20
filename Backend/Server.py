@@ -190,6 +190,40 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         active_websockets.remove(websocket)
 
+@app.websocket("/pty")
+async def pty_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        from winpty import PtyProcess
+        import os
+        moviebox_path = os.path.abspath(os.path.join("Tools", "MovieBox", "moviebox-tui.exe"))
+        
+        # Start MovieBox TUI in the PTY
+        proc = PtyProcess.spawn(moviebox_path)
+        
+        async def read_from_pty():
+            while proc.isalive():
+                try:
+                    data = await asyncio.to_thread(proc.read, 1024)
+                    if not data: break
+                    await websocket.send_text(data)
+                except Exception:
+                    break
+                    
+        asyncio.create_task(read_from_pty())
+        
+        while proc.isalive():
+            data = await websocket.receive_text()
+            proc.write(data)
+            
+    except WebSocketDisconnect:
+        try:
+            if 'proc' in locals() and proc.isalive():
+                proc.terminate()
+        except: pass
+    except Exception as e:
+        print(f"PTY Error: {e}")
+
 class UserQuery(BaseModel):
     text: str
 

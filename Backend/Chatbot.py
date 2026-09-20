@@ -12,7 +12,8 @@ import importlib.util
 
 # --- IMPORT AUTOMATION TOOLS FOR THE AGENT ---
 from Backend.Automation import (
-    GetWeatherPublic, GetRandomJoke, CreateFolder, OpenApp, GoogleSearch
+    GetWeatherPublic, GetRandomJoke, CreateFolder, OpenApp, GoogleSearch,
+    StreamEntertainment, LaunchTacticalOverview, LaunchPinokioNetwork
 )
 from Backend.IoTMatrix import TriggerHardware
 from Backend.Browser_Use import VisualWebAutomator
@@ -193,6 +194,41 @@ AVAILABLE_TOOLS = [
                 "required": ["setting"]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "StreamEntertainment",
+            "description": "Searches and streams a movie, anime, or TV show using the MovieBox TUI interface.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "The name of the movie or show"}
+                },
+                "required": ["query"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "LaunchTacticalOverview",
+            "description": "Launches the God's Eye View 3D geospatial intelligence console (global satellite tracker).",
+            "parameters": {"type": "object", "properties": {}}
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "LaunchPinokioNetwork",
+            "description": "Launches the Pinokio local AI compute browser to run local models (e.g. Stable Diffusion, Llama).",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "script_uri": {"type": "string", "description": "Optional script URL to launch."}
+                }
+            }
+        }
     }
 ]
 
@@ -207,7 +243,10 @@ TOOL_MAP = {
     "TriggerHardware": TriggerHardware,
     "InitiateHousePartyProtocol": InitiateHousePartyProtocol,
     "ExecuteCodeSandbox": ExecuteCodeSandbox,
-    "AdjustSystemSetting": AdjustSystemSetting
+    "AdjustSystemSetting": AdjustSystemSetting,
+    "StreamEntertainment": StreamEntertainment,
+    "LaunchTacticalOverview": LaunchTacticalOverview,
+    "LaunchPinokioNetwork": LaunchPinokioNetwork
 }
 
 # --- INIT HERMES DB (Psych & Technical) ---

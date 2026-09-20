@@ -223,6 +223,63 @@ def Content(Topic):
     
     return f"I have written the report on {Topic} and opened it in Microsoft Word, sir."
 
+def StreamEntertainment(query):
+    """Searches apibay.org for movies and streams via webtorrent/VLC. Falls back to MovieBox-TUI on failure."""
+    import requests
+    import urllib.parse
+    
+    try:
+        # Search PirateBay for movies (cat=200)
+        safe_query = urllib.parse.quote(query)
+        r = requests.get(f"https://apibay.org/q.php?q={safe_query}&cat=200", timeout=5)
+        data = r.json()
+        
+        if data and isinstance(data, list) and data[0].get('info_hash') and data[0].get('info_hash') != '0000000000000000000000000000000000000000':
+            top_hit = data[0]
+            info_hash = top_hit['info_hash']
+            name = top_hit['name']
+            encoded_name = urllib.parse.quote(name)
+            
+            # Construct magnet link
+            magnet = f"magnet:?xt=urn:btih:{info_hash}&dn={encoded_name}&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2F9.rarbg.to%3A2920%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337"
+            
+            # Launch webtorrent with VLC via npx from Tools dir
+            tools_dir = os.path.abspath("Tools")
+            subprocess.Popen(f'start cmd /k "npx webtorrent-cli \\"{magnet}\\" --vlc"', cwd=tools_dir, shell=True)
+            return f"I have found a high-quality stream for {name}. Routing it directly to VLC player now, sir."
+    except Exception as e:
+        print(f"Option B streaming failed: {e}")
+        
+    # Fallback to Option A (MovieBox TUI)
+    moviebox_path = os.path.abspath(os.path.join("Tools", "MovieBox", "moviebox-tui.exe"))
+    if not os.path.exists(moviebox_path):
+        return "MovieBox-TUI executable not found."
+        
+    return f"[MOVIEBOX_SEARCH:{query}] I was unable to find a direct automated stream for {query}. I am falling back to the MovieBox interface for you to select it manually, sir."
+
+def LaunchTacticalOverview():
+    """Starts the God's Eye View local server and opens it in the browser."""
+    gods_eye_path = os.path.abspath(os.path.join("Tools", "GodsEyeView"))
+    if not os.path.exists(gods_eye_path):
+        return "Tactical Overview module not found."
+    
+    try:
+        # Start npm run dev in the background
+        subprocess.Popen('start cmd /c "npm install && npm run dev"', cwd=gods_eye_path, shell=True)
+        return "Tactical Overview (God's Eye View) has been launched on your screen, sir."
+    except Exception as e:
+        return f"Failed to launch Tactical Overview: {str(e)}"
+
+def LaunchPinokioNetwork(script_uri=""):
+    """Launches the Pinokio local AI orchestration browser."""
+    try:
+        # If no specific script, just open the app
+        uri = f"pinokio://{script_uri}" if script_uri else "pinokio://"
+        webbrowser.open(uri)
+        return "Pinokio AI Compute Matrix initiated."
+    except Exception as e:
+        return f"Failed to connect to the Pinokio network: {e}"
+
 # --- DYNAMIC FILE HANDLING ---
 def CreateFolder(command_suffix: str):
     try:
