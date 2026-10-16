@@ -49,17 +49,17 @@ def ChatLogIntegration():
         print(f"ChatLogIntegration Error: {e}")
 
 
-def MainExecution():
+def MainExecution(Query=None):
     SetAssistantStatus("Listening...")
-    print(f"\n>> [{Assistantname.upper()}]: Listening for command...")
-    
-    Query = SpeechRecognition()
+    if not Query:
+        print(f"\n>> [{Assistantname.upper()}]: Listening for command...")
+        Query = SpeechRecognition()
     
     if not Query or Query.strip() == "":
         SetAssistantStatus("Available...")
-        print(f">> [{Assistantname.upper()}]: No command detected. Returning to sleep.")
         return 
         
+    print(f">> [USER]: {Query}")
     ShowTextToScreen(f"{Username} : {Query}")
     SetAssistantStatus("Responding...")
     
@@ -79,26 +79,49 @@ def MainExecution():
     except Exception as e:
         print(f"!! Main Logic Error: {e}")
     
-    sleep(0.5) 
+    sleep(0.2) 
     ChatLogIntegration()
     SetAssistantStatus("Available...")
 
 def wake_word_listener():
-    print(f">> [AUDIO]: UI Mic button listener online.")
+    print(f">> [AUDIO]: Unified Mic Listener online (voice & UI button).")
     SetAssistantStatus("Available...")
     
     while True:
         try:
+            # 1. UI Mic button trigger
             if str(GetMicrophoneStatus()) == "True":
                 SetMicrophoneStatus("False")
                 MainExecution()
-            sleep(0.1)
+                continue
+                
+            # 2. Continuous voice detection with half-duplex self-hearing prevention
+            from Backend.TextToSpeech import is_speaking
+            if not is_speaking():
+                Query = SpeechRecognition()
+                if Query and Query.strip():
+                    MainExecution(Query)
+            else:
+                sleep(0.1)
         except Exception as e:
-            print(f"!! Wake Word Error: {e}")
-            sleep(1)
+            sleep(0.2)
 
 def launch_fastapi():
     try:
+        import socket
+        import subprocess
+        # Check if port 8000 is occupied
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        res = s.connect_ex(('127.0.0.1', 8000))
+        s.close()
+        if res == 0:
+            print(">> [SERVER]: Port 8000 occupied. Clearing lingering socket...")
+            subprocess.run(
+                'for /f "tokens=5" %a in (\'netstat -aon ^| findstr :8000 ^| findstr LISTENING\') do taskkill /F /PID %a',
+                shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            )
+            sleep(0.8)
+
         import uvicorn
         from Backend.Server import app
         print(">> [SERVER]: Starting FastAPI WebSocket & REST on port 8000...")

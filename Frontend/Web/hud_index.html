@@ -2,8 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>JARVIS</title>
+<title>JARVIS — Autonomous Tactical Operating System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="J.A.R.V.I.S. Autonomous AI Operating Assistant — High-performance tactical HUD, real-time telemetry, IoT controls, and live intelligence." />
+<link rel="canonical" href="http://127.0.0.1:8000/hud" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' stroke='%234dd8ff' stroke-width='4' fill='%230a0d11'/><circle cx='50' cy='50' r='30' stroke='%234dd8ff' stroke-width='2' fill='none' stroke-dasharray='6,4'/><circle cx='50' cy='50' r='14' fill='%234dd8ff'/></svg>" />
+<meta property="og:title" content="JARVIS AI Tactical Operating System" />
+<meta property="og:description" content="Next-generation tactical voice assistant and real-time neural command center." />
+<meta property="og:type" content="website" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -67,6 +73,15 @@
   .sub-controls{ display:flex; gap:6px; margin-right:2px; }
   .sub-controls button{ font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; color:var(--text-mid); background:rgba(6,9,12,.7); border:1px solid rgba(120,170,200,.25); padding:5px 10px; border-radius:6px; cursor:pointer; text-transform:uppercase; }
   .sub-controls button.active{ color:var(--cyan); border-color:var(--cyan-dim); }
+
+  .nav-pill{
+    background:rgba(6,9,12,.75); border:1px solid rgba(120,170,200,.25);
+    color:var(--text-mid); font-family:var(--font-mono); font-size:9.5px; letter-spacing:.06em;
+    padding:4px 9px; border-radius:5px; cursor:pointer; text-transform:uppercase;
+    transition:all .2s ease; white-space:nowrap;
+  }
+  .nav-pill:hover{ color:#fff; border-color:var(--cyan-dim); background:rgba(77,216,255,.1); }
+  .nav-pill.active{ color:var(--cyan); border-color:var(--cyan); background:rgba(77,216,255,.2); box-shadow:0 0 8px rgba(77,216,255,.35); font-weight:600; }
 
   /* ---------------- shared screen shell ---------------- */
   .screen{
@@ -463,18 +478,38 @@
 </style>
 </head>
 <body>
+<div id="backendOfflineBanner" style="display:none; position:fixed; top:0; left:0; width:100%; background:rgba(255, 93, 108, 0.95); color:#fff; font-family:'Roboto Mono', monospace; font-size:10px; font-weight:bold; letter-spacing:2px; text-align:center; padding:5px 0; z-index:99999; backdrop-filter:blur(4px); border-bottom:1px solid #ff5d6c;">
+  ▲ DISCONNECTED FROM JARVIS BACKEND — RECONNECTING...
+</div>
 <div id="hologram-container"></div>
 <div class="app">
 
   <div class="shell-controls">
+    <div style="display:flex; align-items:center; margin-right:10px; gap:6px;">
+      <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green);"></span>
+      <span id="hudClockMini" style="font-family:var(--font-mono); font-size:11px; color:var(--cyan); letter-spacing:.08em; font-weight:600;">00:00:00</span>
+    </div>
     <button class="fs-btn" id="fsBtn" title="Fullscreen">⛶</button>
+    <div class="module-nav" id="moduleNav" style="display:flex; gap:5px; margin-right:10px; overflow-x:auto;">
+      <button class="nav-pill" data-nav="idle">◈ Arc Reactor</button>
+      <button class="nav-pill active" data-nav="brief">Briefing &amp; News</button>
+      <button class="nav-pill" data-nav="music">Music Widget</button>
+      <button class="nav-pill" data-nav="diag">Diagnostics</button>
+      <button class="nav-pill" data-nav="data">F1 &amp; Markets</button>
+      <button class="nav-pill" data-nav="home">Smart Home</button>
+      <button class="nav-pill" data-nav="coder">Coder Sandbox</button>
+      <button class="nav-pill" data-nav="security">Security Log</button>
+      <button class="nav-pill" data-nav="comms">PhoneLink</button>
+      <button class="nav-pill" data-nav="chat">System Chat</button>
+      <button class="nav-pill" data-nav="dynamic">⚡ Dynamic UI</button>
+    </div>
     <span class="sub-controls" id="vrSubControls" style="display:none">
       <button class="active" data-vrmode="schematic">Schematic</button>
-      <button data-vrmode="map">Map</button>
-      <button data-vrmode="tracker">Tracker</button>
+      <button data-vrmode="map">Karachi Map</button>
+      <button data-vrmode="tracker">Orbital Radar</button>
     </span>
-    <button class="active" data-mode="widget">Widget</button>
-    <button data-mode="vr">VR HUD</button>
+    <button class="active" data-mode="widget">Widgets</button>
+    <button data-mode="vr">Earth / Map</button>
   </div>
 
   <!-- ============ SCREEN 1: DESKTOP WIDGET ============ -->
@@ -503,76 +538,69 @@
 
     <div class="panel chat-panel" id="panelChat">
       <div class="panel-tab"><span class="sq"></span>SYSTEM_LOG // 710-6</div>
-      <div class="chat-log">
-        <div class="line user">Close the Spotify widget and show the chat widget.</div>
-        <div class="line assistant">Closing the music widget. Opening the chat.</div>
-        <div class="line user">Can you still hear me, mate?</div>
-        <div class="line assistant">I can still hear you loud and clear, Sir. Standing by.</div>
-        <div class="line user">Open the chat widget and also the music widget.</div>
-        <div class="line assistant">Opening the chat. Opening the music widget.</div>
+      <div class="chat-log" id="chatLog">
+        <div class="line assistant sys-line" style="opacity:0.6; font-style:italic;">[SYSTEM ONLINE] Telemetry linked. Waiting for input...</div>
       </div>
       <div class="chat-input-row"><input type="text" id="chatInput" placeholder="enter message..." /><button id="chatSendBtn">[send ⇧]</button></div>
     </div>
 
     <div class="panel cam-panel" id="panelCam">
       <div class="panel-tab"><span class="sq"></span>CAM_FEED</div>
-      <div class="cam-feed"><div class="cam-tag">CAPTURE_TRANSMITTED — LAST SHOT 00:03:14</div></div>
-      <div class="cam-req">// request: what can you see?</div>
-      <div class="cam-footer"><span class="live-tag">LIVE</span><button class="reset-btn">[reset camera]</button></div>
+      <div class="cam-feed"><div class="cam-tag" id="camTag">STANDBY // SENSOR ARMED</div></div>
+      <div class="cam-req" id="camReq">// vision subsystem: ready</div>
+      <div class="cam-footer"><span class="live-tag">READY</span><button class="reset-btn" id="camSnapBtn">[snapshot]</button></div>
     </div>
 
     <div class="panel music-panel" id="panelMusic">
       <div class="panel-tab"><span class="sq"></span>MUSIC_WIDGET</div>
-      <span class="music-status">IDLE</span>
+      <span class="music-status" id="musicStatus">IDLE</span>
       <div class="music-body">
-        <div class="album-art"></div>
+        <div class="album-art" id="albumArt"></div>
         <div class="track-info">
-          <div class="track-title">Still Into You</div>
-          <div class="track-artist">Paramore</div>
-          <div class="track-progress"><div class="bar"><div class="fill"></div></div><div class="times"><span>2:04</span><span>3:36</span></div></div>
-          <div class="transport"><button>⏮</button><button class="play">▶</button><button>⏭</button><button>⟳</button></div>
+          <div class="track-title" id="trackTitle">No Media Active</div>
+          <div class="track-artist" id="trackArtist">Audio Subsystem Standby</div>
+          <div class="track-progress"><div class="bar"><div class="fill" id="trackFill" style="width:0%"></div></div><div class="times"><span id="trackPos">0:00</span><span id="trackDur">0:00</span></div></div>
+          <div class="transport"><button id="btnPrev" title="Previous Track">⏮</button><button class="play" id="btnPlay" title="Play / Pause">▶</button><button id="btnNext" title="Next Track">⏭</button><button id="btnRepeat" title="Repeat">⟳</button></div>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <input type="text" id="musicSearchInput" placeholder="search track on spotify / web..." style="flex:1; background:rgba(0,0,0,0.6); border:1px solid var(--cyan-dim); color:#fff; font-family:var(--font-mono); font-size:10px; padding:3px 6px; border-radius:3px; outline:none;" />
+            <button id="btnPlaySearch" style="background:rgba(77,216,255,0.15); border:1px solid var(--cyan); color:var(--cyan); font-family:var(--font-mono); font-size:9px; padding:3px 8px; border-radius:3px; cursor:pointer;">[PLAY]</button>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="panel brief-panel" id="panelBrief">
-      <div class="ticker-bar">
-        <span>DJIA <b>49,910.6</b> <span class="up">+1.24%</span></span>
-        <span>S&amp;P 500 <b>7,365.1</b> <span class="up">+1.46%</span></span>
-        <span>NASDAQ <b>25,838.9</b> <span class="up">+2.02%</span></span>
-        <span>FTSE 100 <b>14,408.7</b> <span class="down">-0.21%</span></span>
-        <span>WTI <b>81,309.6</b> <span class="down">-1.09%</span></span>
+      <div class="ticker-bar" id="tickerBar">
+        <span>FETCHING LIVE MARKET DATA...</span>
       </div>
       <div class="brief-body">
         <div class="news-feed">
           <div class="news-badge">WORLD DESK · LIVE</div>
-          <div class="breaking-bar">MARKETS RALLY AS RATE-CUT EXPECTATIONS RISE ACROSS MAJOR INDICES</div>
+          <div class="breaking-bar" id="breakingBar">CONNECTING TO LIVE NEWS FEEDS...</div>
         </div>
         <div class="chart-panel">
           <svg viewBox="0 0 100 50" preserveAspectRatio="none"><polyline points="0,38 10,30 20,34 30,20 40,26 50,14 60,18 70,8 80,15 90,6 100,10" fill="none" stroke="#4dd8ff" stroke-width="1.4"/></svg>
         </div>
       </div>
-      <div class="brief-text">
-        <b>Good to see you, Sir.</b> I am online and ready.<br/>
-        • Markets opened higher across the major indices.<br/>
-        • Weather is clear, mild through the afternoon.<br/>
-        • 3 messages are waiting for your review.
+      <div class="brief-text" id="briefText">
+        <b>Good to see you, Sir.</b> Telemetry online.<br/>
+        • Synchronizing live intelligence and local diagnostics...
       </div>
       <div class="dash-cards" style="display:flex; gap:10px; margin-top:10px;">
         <div style="flex:1; background:rgba(77,216,255,0.1); border:1px solid rgba(77,216,255,0.3); padding:10px; border-radius:4px;">
           <div style="font-size:9px; color:var(--cyan); letter-spacing:1px; margin-bottom:4px;">WEATHER STATION</div>
-          <div style="font-size:14px; color:#fff; font-weight:bold;">24°C / Clear</div>
-          <div style="font-size:10px; color:var(--text-mid); margin-top:4px;">No severe alerts.</div>
+          <div id="weatherTemp" style="font-size:14px; color:#fff; font-weight:bold;">--°C / Syncing</div>
+          <div id="weatherDesc" style="font-size:10px; color:var(--text-mid); margin-top:4px;">Connecting to weather station...</div>
         </div>
         <div style="flex:1; background:rgba(77,216,255,0.1); border:1px solid rgba(77,216,255,0.3); padding:10px; border-radius:4px;">
           <div style="font-size:9px; color:var(--cyan); letter-spacing:1px; margin-bottom:4px;">SMART-HOME</div>
-          <div style="font-size:14px; color:#fff; font-weight:bold;">TP-Link Kasa: Online</div>
-          <div style="font-size:10px; color:var(--text-mid); margin-top:4px;">UDP Connected.</div>
+          <div id="homeBriefStatus" style="font-size:14px; color:#fff; font-weight:bold;">Kasa IoT: Online</div>
+          <div id="homeBriefSub" style="font-size:10px; color:var(--text-mid); margin-top:4px;">Subnet plug verified.</div>
         </div>
         <div style="flex:1; background:rgba(77,216,255,0.1); border:1px solid rgba(77,216,255,0.3); padding:10px; border-radius:4px;">
-          <div style="font-size:9px; color:var(--cyan); letter-spacing:1px; margin-bottom:4px;">GITHUB BRIDGE</div>
-          <div style="font-size:14px; color:#fff; font-weight:bold;">Repo Synced</div>
-          <div style="font-size:10px; color:var(--text-mid); margin-top:4px;">Origin/Main is updated.</div>
+          <div style="font-size:9px; color:var(--cyan); letter-spacing:1px; margin-bottom:4px;">CORE ENGINE</div>
+          <div id="sysBriefStatus" style="font-size:14px; color:#fff; font-weight:bold;">Central Nervous System</div>
+          <div id="sysBriefSub" style="font-size:10px; color:var(--text-mid); margin-top:4px;">Local event loop active.</div>
         </div>
       </div>
     </div>
@@ -581,13 +609,13 @@
     <div class="panel wide-panel" id="panelDiag">
       <div class="panel-tab"><span class="sq"></span>NERVOUS_SYSTEM // DIAGNOSTICS</div>
       <div class="diag-gauges">
-        <div class="gauge" id="gaugeCpu" data-pct="47"><svg viewBox="0 0 100 100"><circle class="gauge-track" cx="50" cy="50" r="42"/><circle class="gauge-fill" cx="50" cy="50" r="42"/></svg><div class="gauge-value"><span class="num">47</span><span class="pct">%</span></div><div class="gauge-label">CPU</div></div>
-        <div class="gauge" id="gaugeGpu" data-pct="63"><svg viewBox="0 0 100 100"><circle class="gauge-track" cx="50" cy="50" r="42"/><circle class="gauge-fill" cx="50" cy="50" r="42"/></svg><div class="gauge-value"><span class="num">63</span><span class="pct">%</span></div><div class="gauge-label">GPU</div></div>
-        <div class="gauge" id="gaugeRam" data-pct="38"><svg viewBox="0 0 100 100"><circle class="gauge-track" cx="50" cy="50" r="42"/><circle class="gauge-fill" cx="50" cy="50" r="42"/></svg><div class="gauge-value"><span class="num">38</span><span class="pct">%</span></div><div class="gauge-label">RAM</div></div>
-        <div class="gauge" id="gaugeTemp" data-pct="71"><svg viewBox="0 0 100 100"><circle class="gauge-track" cx="50" cy="50" r="42"/><circle class="gauge-fill" cx="50" cy="50" r="42"/></svg><div class="gauge-value"><span class="num">58</span><span class="pct">°C</span></div><div class="gauge-label">CORE TEMP</div></div>
+        <div class="gauge" id="gaugeCpu" data-pct="0"><svg viewBox="0 0 100 100"><circle class="gauge-track" cx="50" cy="50" r="42"/><circle class="gauge-fill" cx="50" cy="50" r="42"/></svg><div class="gauge-value"><span class="num">0</span><span class="pct">%</span></div><div class="gauge-label">CPU</div></div>
+        <div class="gauge" id="gaugeGpu" data-pct="0"><svg viewBox="0 0 100 100"><circle class="gauge-track" cx="50" cy="50" r="42"/><circle class="gauge-fill" cx="50" cy="50" r="42"/></svg><div class="gauge-value"><span class="num">0</span><span class="pct">%</span></div><div class="gauge-label">GPU</div></div>
+        <div class="gauge" id="gaugeRam" data-pct="0"><svg viewBox="0 0 100 100"><circle class="gauge-track" cx="50" cy="50" r="42"/><circle class="gauge-fill" cx="50" cy="50" r="42"/></svg><div class="gauge-value"><span class="num">0</span><span class="pct">%</span></div><div class="gauge-label">RAM</div></div>
+        <div class="gauge" id="gaugeTemp" data-pct="0"><svg viewBox="0 0 100 100"><circle class="gauge-track" cx="50" cy="50" r="42"/><circle class="gauge-fill" cx="50" cy="50" r="42"/></svg><div class="gauge-value"><span class="num">0</span><span class="pct">°C</span></div><div class="gauge-label">CORE TEMP</div></div>
       </div>
       <div class="diag-net">
-        <div class="diag-net-head"><span>NETWORK BANDWIDTH</span><span class="diag-net-val" id="netVal">128 Mb/s ↓ · 22 Mb/s ↑</span></div>
+        <div class="diag-net-head"><span>NETWORK BANDWIDTH</span><span class="diag-net-val" id="netVal">0 Mb/s ↓ · 0 Mb/s ↑</span></div>
         <svg class="net-graph" viewBox="0 0 300 44" preserveAspectRatio="none">
           <defs><linearGradient id="netGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4dd8ff" stop-opacity=".5"/><stop offset="100%" stop-color="#4dd8ff" stop-opacity="0"/></linearGradient></defs>
           <polygon class="net-fill" id="netFill" points=""/>
@@ -601,22 +629,20 @@
       <div class="panel-tab"><span class="sq"></span>IOT_MATRIX // SMART HOME</div>
       <div class="home-body">
         <div class="home-toggles">
-          <div class="toggle-row"><span>Living Room</span><button class="toggle on" data-room="living"></button></div>
-          <div class="toggle-row"><span>Bedroom</span><button class="toggle" data-room="bedroom"></button></div>
-          <div class="toggle-row"><span>Kitchen</span><button class="toggle on" data-room="kitchen"></button></div>
-          <div class="toggle-row"><span>Study</span><button class="toggle" data-room="study"></button></div>
-          <div class="toggle-row"><span>Porch</span><button class="toggle on" data-room="porch"></button></div>
+          <div class="toggle-row"><span>Main Desk Appliance</span><button class="toggle" id="togglePlug" data-device="plug_1"></button></div>
+          <div class="toggle-row"><span>Studio Illumination</span><button class="toggle" id="toggleLight" data-device="light_1"></button></div>
+          <div class="toggle-row"><span>Subnet Device Bridge</span><button class="toggle on" id="toggleBridge" data-device="bridge"></button></div>
         </div>
         <div class="thermo" id="thermoDial">
           <svg viewBox="0 0 120 120"><circle class="thermo-track" cx="60" cy="60" r="50"/><circle class="thermo-fill" id="thermoFill" cx="60" cy="60" r="50"/></svg>
-          <div class="thermo-readout"><span class="thermo-temp" id="thermoTemp">23°</span><span class="thermo-sub">COOLING</span></div>
+          <div class="thermo-readout"><span class="thermo-temp" id="thermoTemp">21°</span><span class="thermo-sub">CLIMATE NOMINAL</span></div>
         </div>
       </div>
       <div class="thermo-btns"><button data-delta="-1">−</button><span style="font-size:9px;color:var(--text-dim);letter-spacing:.1em;">THERMOSTAT</span><button data-delta="1">+</button></div>
       <div class="home-devices">
-        <div class="device-row"><span class="dev-dot on"></span>Living Room TV<span class="dev-status">Connected</span></div>
-        <div class="device-row"><span class="dev-dot on"></span>Sonos Soundbar<span class="dev-status">Streaming</span></div>
-        <div class="device-row"><span class="dev-dot"></span>Bedroom Speaker<span class="dev-status">Idle</span></div>
+        <div class="device-row"><span class="dev-dot on"></span>Main Desk Appliance<span class="dev-status">ONLINE</span></div>
+        <div class="device-row"><span class="dev-dot"></span>Studio Illumination<span class="dev-status">OFF</span></div>
+        <div class="device-row"><span class="dev-dot on"></span>TP-Link Kasa UDP Bridge<span class="dev-status">LINKED</span></div>
       </div>
     </div>
 
@@ -624,37 +650,36 @@
     <div class="panel wide-panel" id="panelData">
       <div class="panel-tab"><span class="sq"></span>DATA_STREAMS</div>
       <div class="data-tabs">
-        <button class="data-tab active" data-tab="f1">F1 TELEMETRY</button>
-        <button class="data-tab" data-tab="quant">MARKETS</button>
+        <button class="data-tab" data-tab="f1">F1 TELEMETRY</button>
+        <button class="data-tab active" data-tab="quant">MARKETS</button>
       </div>
-      <div class="data-view" data-view="f1">
+      <div class="data-view" data-view="f1" hidden>
         <div class="f1-row">
           <div class="rpm-bar" id="rpmBar"></div>
-          <div class="gear-box"><span class="gear-num" id="gearNum">5</span><span class="gear-label">GEAR</span></div>
-          <div class="speed-box"><span class="speed-num" id="speedNum">287</span><span class="speed-unit">KM/H</span></div>
+          <div class="gear-box"><span class="gear-num" id="gearNum">N</span><span class="gear-label">GEAR</span></div>
+          <div class="speed-box"><span class="speed-num" id="speedNum">0</span><span class="speed-unit">KM/H</span></div>
         </div>
         <div class="tire-row">
-          <div class="tire"><span class="tire-pct">78%</span><span class="tire-label">FL</span></div>
-          <div class="tire"><span class="tire-pct">81%</span><span class="tire-label">FR</span></div>
-          <div class="tire warn"><span class="tire-pct">62%</span><span class="tire-label">RL</span></div>
-          <div class="tire warn"><span class="tire-pct">59%</span><span class="tire-label">RR</span></div>
+          <div class="tire"><span class="tire-pct">--</span><span class="tire-label">FL</span></div>
+          <div class="tire"><span class="tire-pct">--</span><span class="tire-label">FR</span></div>
+          <div class="tire"><span class="tire-pct">--</span><span class="tire-label">RL</span></div>
+          <div class="tire"><span class="tire-pct">--</span><span class="tire-label">RR</span></div>
+        <div class="lap-info" id="f1LapInfo">FIA PIT WALL TELEMETRY: STANDBY · SYNCING FIA CALENDAR</div>
+        <div id="f1ScheduleBox" style="font-size:10px; color:var(--text-mid); margin-top:8px; line-height:1.4; background:rgba(0,0,0,0.4); padding:6px; border-radius:4px; border:1px solid rgba(77,216,255,0.15);">
+          <div style="color:var(--cyan); font-weight:bold; margin-bottom:2px;">🏎 UPCOMING GRAND PRIX:</div>
+          <div id="f1NextRace">Fetching official FIA schedule...</div>
+          <div id="f1LastRace" style="margin-top:4px; color:var(--text-dim); font-size:9px;"></div>
         </div>
-        <div class="lap-info">LAP 34/58 · P2 · GAP +1.284s</div>
       </div>
-      <div class="data-view" data-view="quant" hidden>
+      <div class="data-view" data-view="quant">
         <div class="quant-row">
           <div class="candles"><svg id="candleSvg" viewBox="0 0 220 80" preserveAspectRatio="none"></svg></div>
           <div class="orderbook">
             <div class="ob-head">ORDER BOOK — BTC/USDT</div>
-            <div class="ob-row ask"><span>68,452</span><span>0.18</span></div>
-            <div class="ob-row ask"><span>68,431</span><span>0.42</span></div>
-            <div class="ob-row ask"><span>68,410</span><span>0.65</span></div>
-            <div class="ob-row bid"><span>68,388</span><span>0.51</span></div>
-            <div class="ob-row bid"><span>68,365</span><span>0.77</span></div>
-            <div class="ob-row bid"><span>68,340</span><span>0.33</span></div>
+            <div class="ob-row ask"><span>Loading...</span><span>--</span></div>
           </div>
         </div>
-        <div class="pnl-row">Portfolio P&amp;L · <span class="pnl-val up">+2,148.60 (+3.24%)</span></div>
+        <div class="pnl-row">BTC/USDT · <span class="pnl-val up">Loading live quote...</span></div>
       </div>
     </div>
 
@@ -668,20 +693,16 @@
             <polyline class="wave-target" points="0,26 10,14 20,32 30,10 40,26 50,18 60,30 70,12 80,26 90,20 100,32 110,14 120,26 130,18 140,30 150,12 160,26 170,20 180,32 190,14 200,26 210,20 220,26"/>
             <polyline class="wave-live" points="0,26 10,16 20,30 30,12 40,26 50,20 60,28 70,14 80,26 90,22 100,30 110,16 120,26 130,20 140,28 150,14 160,26 170,22 180,30 190,16 200,26 210,22 220,26"/>
           </svg>
-          <div class="voice-score">98.6% MATCH — VOICE CONFIRMED</div>
+          <div class="voice-score">BIOMETRIC VAULT: ACTIVE &amp; ARMED</div>
         </div>
         <div class="scan-ring">
           <svg viewBox="0 0 120 120"><circle class="scan-track" cx="60" cy="60" r="50"/><circle class="scan-sweep" cx="60" cy="60" r="50"/></svg>
           <div class="scan-icon">◎</div>
-          <div class="scan-status" id="scanStatus">SCANNING RETINA…</div>
+          <div class="scan-status" id="scanStatus">AUTHENTICATED</div>
         </div>
       </div>
       <div class="sec-log">
-        <div class="sec-row">14:02:11 — Face ID confirmed at front door.</div>
-        <div class="sec-row warn">14:07:48 — ⚠ Unrecognized device joined 5GHz network.</div>
-        <div class="sec-row">14:09:03 — Perimeter sensors nominal.</div>
-        <div class="sec-row warn">14:12:55 — ⚠ Failed login attempt — port 8081.</div>
-        <div class="sec-row">14:15:20 — Nightly backup completed.</div>
+        <div class="sec-row">[AUDIT] Querying Windows Security Event Log...</div>
       </div>
     </div>
 
@@ -691,48 +712,50 @@
       <div class="comms-stack">
         <div class="comms-card">
           <div class="comms-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H9l-4 4V5z"/></svg></div>
-          <div class="comms-meta"><div class="comms-title">Incoming — Ahmed Raza</div><div class="comms-sub">+92 300 1234567</div></div>
-          <div class="comms-actions"><button class="accept">✓</button><button class="decline">✕</button></div>
+          <div class="comms-meta"><div class="comms-title" id="phoneLinkTitle">Cellular Bridge: Ready</div><div class="comms-sub" id="phoneLinkSub">Click [BEAM QR] to sync clipboard to phone</div></div>
+          <div class="comms-actions"><button class="accept" id="btnPhoneBeam" title="Generate QR Code to Phone" style="cursor:pointer; background:rgba(77,216,255,0.2); border:1px solid var(--cyan); color:var(--cyan); font-size:10px; padding:4px 8px; border-radius:3px;">BEAM QR</button></div>
         </div>
         <div class="comms-card">
           <div class="comms-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div>
-          <div class="comms-meta"><div class="comms-title">Ali Haider Industries</div><div class="comms-sub">Re: OPC UA gateway config…</div></div>
+          <div class="comms-meta"><div class="comms-title" id="emailTitle">Email Dispatcher: Online</div><div class="comms-sub" id="emailSub">Syncing mailboxes...</div></div>
+          <div class="comms-actions"><button id="btnCheckEmail" title="Check Inbox" style="cursor:pointer; background:rgba(77,216,255,0.2); border:1px solid var(--cyan); color:var(--cyan); font-size:10px; padding:4px 8px; border-radius:3px;">CHECK</button></div>
         </div>
         <div class="comms-card">
           <div class="comms-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/></svg></div>
-          <div class="comms-meta"><div class="comms-title">Isbah</div><div class="comms-sub">pushed the digital-twin dashboard update</div></div>
+          <div class="comms-meta"><div class="comms-title">Unified Voice Stream</div><div class="comms-sub">Microphone Subsystem Calibrated &amp; Active</div></div>
         </div>
       </div>
     </div>
 
     <!-- 6. Local Coder & Sandbox -->
     <div class="panel coder-panel" id="panelCoder">
-      <div class="term-titlebar"><span class="term-dots"><i></i><i></i><i></i></span><span class="term-file">sandbox_run.py</span></div>
-      <div class="term-body">
-        <div class="code-line"><span class="ln">1</span><span class="kw">import</span> <span class="mod">jarvis_core</span> <span class="kw">as</span> <span class="mod">jc</span></div>
-        <div class="code-line"><span class="ln">2</span></div>
-        <div class="code-line"><span class="ln">3</span><span class="kw">def</span> <span class="fn">detect_intent</span>(<span class="arg">audio</span>):</div>
-        <div class="code-line"><span class="ln">4</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="arg">text</span> = jc.transcribe(<span class="arg">audio</span>)</div>
-        <div class="code-line"><span class="ln">5</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="str">"open_camera"</span></div>
-        <div class="code-line"><span class="ln">6</span><span class="cursor-blink">▌</span></div>
+      <div class="term-titlebar" style="display:flex; align-items:center;">
+        <span class="term-dots"><i></i><i></i><i></i></span>
+        <span class="term-file">sandbox_run.py</span>
+        <button id="btnRunCode" style="margin-left:auto; background:rgba(63,224,138,0.2); border:1px solid #3fe08a; color:#3fe08a; font-family:var(--font-mono); font-size:10px; padding:2px 8px; border-radius:3px; cursor:pointer;">[▶ RUN CODE]</button>
+      </div>
+      <div class="term-body" style="padding:6px;">
+        <textarea id="coderTextarea" style="width:100%; height:130px; background:rgba(0,0,0,0.5); border:1px solid rgba(77,216,255,0.2); color:#4dd8ff; font-family:var(--font-mono); font-size:11px; padding:6px; resize:none; outline:none; border-radius:3px;" spellcheck="false">import sys, platform
+print(f"JARVIS Core online on {platform.system()} ({platform.node()})")
+print("Python Sandbox verified and operational.")</textarea>
+        <pre id="coderOutput" style="margin:4px 0 0 0; max-height:80px; overflow-y:auto; font-family:var(--font-mono); font-size:10px; color:#3fe08a; background:rgba(0,0,0,0.7); padding:4px; border-radius:3px; white-space:pre-wrap;"></pre>
       </div>
       <div class="term-footer">
         <div class="term-progress"><div class="term-progress-fill" id="coderProgress"></div></div>
-        <span class="term-status" id="coderStatus">RUNNING sandbox_run.py …</span>
+        <span class="term-status" id="coderStatus">SANDBOX READY — Edit code and click [▶ RUN CODE]</span>
       </div>
     </div>
 
-    <!-- 7. Dynamic fallback panel -->
+    <!-- 7. Dynamic fallback / Generative UI panel -->
     <div class="panel dynamic-panel" id="panelDynamic">
-      <div class="panel-tab"><span class="sq"></span>[DYNAMIC_QUERY_RESULT]</div>
+      <div class="panel-tab"><span class="sq"></span>[DYNAMIC_GENERATIVE_UI // 00-GEN]</div>
+      <div style="padding:10px 14px 6px; display:flex; gap:6px; border-bottom:1px solid var(--cyan-dim); background:rgba(0,0,0,0.3);">
+        <input type="text" id="genUiInput" placeholder="Enter prompt to generate new UI element (e.g. 'Currency converter', 'Explain quantum computing')..." style="flex:1; background:rgba(10,13,17,0.85); border:1px solid var(--cyan-dim); color:#fff; font-family:var(--font-mono); font-size:10px; padding:5px 8px; border-radius:4px; outline:none;" />
+        <button id="genUiBtn" style="background:rgba(77,216,255,0.18); border:1px solid var(--cyan); color:var(--cyan); font-family:var(--font-mono); font-size:9.5px; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:600;">[GENERATE UI]</button>
+      </div>
       <div class="dynamic-body" id="dynamicBody">
-        <p>Here's what I found, Sir — <b>pancakes</b> only need a handful of pantry staples.</p>
-        <ul>
-          <li>1½ cups all-purpose flour</li>
-          <li>2 tbsp sugar, 2 tsp baking powder</li>
-          <li>1¼ cups milk, 1 egg, 2 tbsp melted butter</li>
-        </ul>
-        <p>Whisk the dry and wet ingredients separately, then fold together — don't overmix.</p>
+        <p style="font-weight:bold; color:var(--cyan); margin-bottom:6px;">DYNAMIC KNOWLEDGE &amp; GENERATIVE UI SYSTEM</p>
+        <p style="color:var(--text-mid); font-size:12px; line-height:1.5;">Awaiting query. Factual requests, scientific breakdowns, recipes, custom calculators, or ad-hoc components will be rendered live in this interface.</p>
       </div>
     </div>
 
@@ -774,9 +797,11 @@
     <div class="ruler-left"></div>
 
     <div class="vr-window" id="trackerWindow" style="opacity:0; pointer-events:none; z-index:5;">
-      <div class="win-titlebar"><span>? EARTH TRACKER — NASA EONET</span><span class="win-controls">- ? ?</span></div>
-      <div class="win-body" style="padding:0;">
-        <div id="trackerMap" style="width:100%; height:100%; background:#0a0d10;"></div>
+      <div class="win-titlebar"><span>◈ EARTH TRACKER — ORBITAL RADAR</span><span class="win-controls">— ▢ ✕</span></div>
+      <div class="win-body" style="padding:0; position:relative; overflow:hidden; background:#070a0d;">
+        <canvas id="radarSweepCanvas" style="width:100%; height:100%; display:block;"></canvas>
+        <div id="radarTargetInfo" style="position:absolute; top:12px; left:14px; font-family:var(--font-mono); font-size:10px; color:var(--cyan); pointer-events:none;">TARGET: ISS (408 KM) · SCANNING...</div>
+        <div id="trackerMap" style="width:100%; height:100%; background:#0a0d10; display:none;"></div>
         <div id="trackerOfflineNote" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#ff5d6c; font-family:'Roboto Mono'; display:none; background:rgba(10,13,16,0.9); padding:10px; border:1px solid #ff5d6c;">TRACKER OFFLINE</div>
       </div>
     </div>
@@ -862,12 +887,17 @@
     const now = new Date();
     const hh = String(now.getHours()).padStart(2,'0');
     const mm = String(now.getMinutes()).padStart(2,'0');
-    document.getElementById('clockTime').textContent = hh+':'+mm;
+    const ss = String(now.getSeconds()).padStart(2,'0');
+    const cEl = document.getElementById('clockTime');
+    if (cEl) cEl.textContent = hh+':'+mm;
+    const mini = document.getElementById('hudClockMini');
+    if (mini) mini.textContent = hh+':'+mm+':'+ss;
     const days=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
     const months=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-    document.getElementById('clockDate').textContent = days[now.getDay()]+' · '+now.getDate()+' '+months[now.getMonth()];
+    const dEl = document.getElementById('clockDate');
+    if (dEl) dEl.textContent = days[now.getDay()]+' · '+now.getDate()+' '+months[now.getMonth()];
   }
-  tick(); setInterval(tick, 15000);
+  tick(); setInterval(tick, 1000);
 
   const panels = {
     chat:document.getElementById('panelChat'), camera:document.getElementById('panelCam'),
@@ -881,11 +911,25 @@
   const dockBtns = document.querySelectorAll('.dock-btn');
   function setMode(mode){
     dockBtns.forEach(b=>b.classList.toggle('active', b.dataset.mode===mode));
-    Object.entries(panels).forEach(([key,el])=>el.classList.toggle('show', key===mode));
+    document.querySelectorAll('.nav-pill').forEach(p=>p.classList.toggle('active', p.dataset.nav===mode));
+    Object.entries(panels).forEach(([key,el])=>{ if(el) el.classList.toggle('show', key===mode); });
     if(mode==='idle'){ idleStack.style.opacity=1; idleStack.style.transform='translate(-50%,-50%)'; }
     else{ idleStack.style.opacity=0; idleStack.style.transform='translate(-50%,-58%)'; }
   }
   dockBtns.forEach(btn=>btn.addEventListener('click', ()=>setMode(btn.dataset.mode)));
+
+  document.querySelectorAll('.nav-pill').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const target = btn.dataset.nav;
+      const wBtn = document.querySelector('.shell-controls button[data-mode="widget"]');
+      if (wBtn && !wBtn.classList.contains('active')) wBtn.click();
+      revealDockPage(target);
+      setMode(target);
+    });
+  });
+
+  // Default to live Briefing & News dashboard on load
+  setMode('brief');
 
   document.querySelectorAll('#dockDots .dot').forEach(dot=>{
     dot.addEventListener('click', ()=>{
@@ -957,7 +1001,10 @@
     }
     try{
       trackerMap = L.map('trackerMap', { zoomControl:false, attributionControl:false, worldCopyJump:true }).setView([20, 0], 2);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(trackerMap);
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 16,
+        attribution: 'Tiles &copy; Esri'
+      }).addTo(trackerMap);
       setTimeout(()=>trackerMap.invalidateSize(), 60);
     }catch(e){
       const errNote = document.getElementById('trackerOfflineNote');
@@ -965,7 +1012,7 @@
     }
   }
 
-  /* ---------------- real map: Karachi, Pakistan (Leaflet + CARTO dark tiles) ---------------- */
+  /* ---------------- real map: Karachi, Pakistan (Leaflet + Esri Dark Canvas) ---------------- */
   let mapEntered = false;
   let karachiMap = null;
   let currentMarker = null;
@@ -987,9 +1034,9 @@
     try{
       karachiMap = L.map('leafletMap', { zoomControl:true, attributionControl:true, worldCopyJump:true })
         .setView([KARACHI_LOCATIONS.world.lat, KARACHI_LOCATIONS.world.lng], KARACHI_LOCATIONS.world.zoom);
-      const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-        subdomains: 'abcd', maxZoom: 19
+      const tiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; DeLorme, NAVTEQ',
+        maxZoom: 16
       });
       tiles.on('tileerror', ()=>document.getElementById('mapOfflineNote').classList.add('show'));
       tiles.addTo(karachiMap);
@@ -1034,195 +1081,727 @@
   window.addEventListener('resize', placeTicks);
 
   /* ============================================================
-     JARVIS LIVE DATA ENGINE
+     JARVIS LIVE DATA ENGINE — Protocol v1
      All data is fetched from the FastAPI backend via WebSockets
      ============================================================ */
   const API = 'http://localhost:8000/api';
   let ws;
   let reconnectTimer;
+  let lastSeq = 0;
+
+  function escapeHtml(str) {
+    if (typeof str !== 'string') return String(str !== undefined && str !== null ? str : '');
+    return str.replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[m]);
+  }
+
+  function showOfflineBanner() {
+    const banner = document.getElementById('backendOfflineBanner');
+    if (banner) banner.style.display = 'block';
+    document.querySelectorAll('.panel').forEach(p => p.style.filter = 'grayscale(0.6) brightness(0.7)');
+    const glitch = document.querySelector('.glitch');
+    if (glitch) glitch.textContent = 'JARVIS: OFFLINE';
+  }
+
+  function hideOfflineBanner() {
+    const banner = document.getElementById('backendOfflineBanner');
+    if (banner) banner.style.display = 'none';
+    document.querySelectorAll('.panel').forEach(p => p.style.filter = 'none');
+    document.getElementById('clockDate').textContent = new Date().toDateString().toUpperCase();
+  }
 
   function connectWebSocket() {
-    ws = new WebSocket('ws://localhost:8000/api/ws/hud');
+    const wsUrl = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + 
+                  (window.location.host || 'localhost:8000') + '/api/ws/hud';
+    try {
+      ws = new WebSocket(wsUrl);
+    } catch(e) {
+      console.warn('WebSocket init fallback to localhost:8000:', e);
+      ws = new WebSocket('ws://localhost:8000/api/ws/hud');
+    }
     
     ws.onopen = () => {
       console.log('JARVIS WebSocket connected.');
-      // Update UI offline states to online if needed
-      document.querySelectorAll('.panel').forEach(p => p.style.filter = 'none');
-      document.getElementById('clockDate').textContent = new Date().toDateString().toUpperCase();
+      hideOfflineBanner();
+      hydrateAllRealData();
+      if (lastSeq > 0) {
+        try {
+          ws.send(JSON.stringify({ type: 'catchup', last_seq: lastSeq }));
+        } catch(err) {
+          console.warn('Failed to send catchup:', err);
+        }
+      }
     };
 
     ws.onclose = () => {
-      console.warn('JARVIS WebSocket disconnected. Reconnecting in 3s...');
-      document.querySelectorAll('.panel').forEach(p => p.style.filter = 'grayscale(0.6) brightness(0.6)');
+      console.warn('JARVIS WebSocket disconnected. Reconnecting in 2s...');
+      showOfflineBanner();
       clearTimeout(reconnectTimer);
-      reconnectTimer = setTimeout(connectWebSocket, 3000);
+      reconnectTimer = setTimeout(connectWebSocket, 2000);
+    };
+
+    ws.onerror = (err) => {
+      console.warn('JARVIS WebSocket error:', err);
     };
 
     ws.onmessage = (event) => {
       try {
         const payload = JSON.parse(event.data);
-        handleSocketMessage(payload.type, payload.data);
+        if (payload.seq && typeof payload.seq === 'number') {
+          lastSeq = Math.max(lastSeq, payload.seq);
+        }
+        const type = payload.type;
+        const d = payload.payload !== undefined ? payload.payload : (payload.data !== undefined ? payload.data : payload);
+        handleSocketMessage(type, d, payload);
       } catch (e) {
         console.error('Error parsing WS message:', e);
       }
     };
   }
 
-  function handleSocketMessage(type, d) {
-    if (type === 'text_output') {
-      const chatLog = document.querySelector('.chat-log');
-      if(chatLog){
-        // d is a string: "User : Hello" or "JARVIS : Hi"
-        const isUser = d.startsWith("User") || d.toLowerCase().includes(" : ") === false;
-        const className = isUser ? 'user' : 'assistant';
-        chatLog.innerHTML += `<div class="line ${className}">${d}</div>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
+  function renderChatHistory(messages) {
+    const chatLog = document.getElementById('chatLog') || document.querySelector('.chat-log');
+    if (!chatLog) return;
+    if (!messages || messages.length === 0) {
+      chatLog.innerHTML = '<div class="line assistant sys-line" style="opacity:0.6; font-style:italic;">[SYSTEM ONLINE] Telemetry linked. Waiting for input...</div>';
+      return;
+    }
+    let html = '';
+    messages.forEach(m => {
+      const role = (m.role === 'user' || m.role === 'human') ? 'user' : 'assistant';
+      const content = m.content || m.text || '';
+      if (content) {
+        html += `<div class="line ${role}">${escapeHtml(content)}</div>`;
       }
-    }
-    else if (type === 'status_change') {
-      const statusLbl = document.querySelector('.status-text') || document.querySelector('.central-status') || document.getElementById('jarvisStatus');
-      if(statusLbl) statusLbl.textContent = d;
-      // In the mockup, there might not be a dedicated status label with these exact IDs, 
-      // but let's try to update any element that might represent the status.
-      // E.g., JARVIS LIVE text
-      const jLive = document.querySelector('.glitch');
-      if(jLive && d) jLive.textContent = `JARVIS: ${d.toUpperCase()}`;
-    }
-    else if (type === 'swarm_message') {
-      // d is {agent: "AGENT", message: "..."}
-      const chatLog = document.querySelector('.chat-log');
-      if(chatLog && d.message) {
-        chatLog.innerHTML += `<div class="line" style="color: #888; font-size: 0.9em; font-style: italic;">[${d.agent}] ${d.message}</div>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
-      }
-    }
-    else if (type === 'tts_waveform') {
-      // Not fully implemented in 2D UI, but we can flash a border
-      const p = document.getElementById('panelDynamic');
-      if(p) {
-        p.style.boxShadow = `0 0 ${d.intensity * 20}px rgba(0, 255, 255, 0.5)`;
-        setTimeout(() => { p.style.boxShadow = ''; }, 200);
-      }
-    }
-    else if (type === 'widget_command') {
-      if(d.action === "set_core_color") {
-        document.documentElement.style.setProperty('--color-primary', d.color);
-      }
-    }
-    else if (type === 'diagnostics') {
-      setGauge(gauges.cpu, d.cpu, '%');
-      setGauge(gauges.gpu, d.gpu, '%');
-      setGauge(gauges.ram, d.ram, '%');
-      const tempPct = Math.min(100, (d.core_temp / 100) * 100);
-      setGauge(gauges.temp, tempPct, '°C');
-      gauges.temp.querySelector('.gauge-value .num').textContent = Math.round(d.core_temp);
-      
-      netHistory.shift();
-      netHistory.push(d.net_down_mbps);
-      drawNet();
-      document.getElementById('netVal').textContent = `${d.net_down_mbps.toFixed(0)} Mb/s ↓ · ${d.net_up_mbps.toFixed(0)} Mb/s ↑`;
-    } 
-    else if (type === 'media') {
-      const titleEl = document.querySelector('.track-title');
-      const artistEl = document.querySelector('.track-artist');
-      const statusEl = document.querySelector('.music-status');
-      const fillEl = document.querySelector('.track-progress .fill');
-      const timesEl = document.querySelectorAll('.times span');
-      const playBtn = document.querySelector('.transport .play');
+    });
+    chatLog.innerHTML = html;
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
 
-      if(d.playing && titleEl){
-        titleEl.textContent = d.title || 'Unknown';
-        artistEl.textContent = d.artist || 'Unknown Artist';
-        statusEl.textContent = d.status === 'Playing' ? 'PLAYING' : (d.status || 'PAUSED');
-        if(d.duration_sec > 0){
-          const pct = (d.position_sec / d.duration_sec) * 100;
-          fillEl.style.width = pct + '%';
-          const fmtTime = (s) => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
-          if(timesEl.length >= 2){ timesEl[0].textContent = fmtTime(d.position_sec); timesEl[1].textContent = fmtTime(d.duration_sec); }
-        }
-        if(playBtn) playBtn.textContent = d.status === 'Playing' ? '⏸' : '▶';
-      } else if (titleEl) {
-        statusEl.textContent = 'NO MEDIA';
+  function renderMediaData(d) {
+    const titleEl = document.getElementById('trackTitle') || document.querySelector('.track-title');
+    const artistEl = document.getElementById('trackArtist') || document.querySelector('.track-artist');
+    const statusEl = document.getElementById('musicStatus') || document.querySelector('.music-status');
+    const fillEl = document.getElementById('trackFill') || document.querySelector('.track-progress .fill');
+    const posEl = document.getElementById('trackPos');
+    const durEl = document.getElementById('trackDur');
+    const playBtn = document.getElementById('btnPlay') || document.querySelector('.transport .play');
+
+    if (d && d.playing && d.title) {
+      if (titleEl) titleEl.textContent = d.title;
+      if (artistEl) artistEl.textContent = d.artist || 'Unknown Artist';
+      if (statusEl) statusEl.textContent = d.status === 'Playing' ? 'PLAYING' : (d.status || 'PAUSED');
+      if (d.duration_sec > 0 && fillEl) {
+        const pct = Math.min(100, (d.position_sec / d.duration_sec) * 100);
+        fillEl.style.width = pct + '%';
+        const fmtTime = (s) => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+        if (posEl) posEl.textContent = fmtTime(d.position_sec);
+        if (durEl) durEl.textContent = fmtTime(d.duration_sec);
+      }
+      if (playBtn) playBtn.textContent = d.status === 'Playing' ? '⏸' : '▶';
+    } else {
+      if (titleEl) titleEl.textContent = 'No Media Active';
+      if (artistEl) artistEl.textContent = 'Audio Subsystem Standby';
+      if (statusEl) statusEl.textContent = 'IDLE';
+      if (fillEl) fillEl.style.width = '0%';
+      if (posEl) posEl.textContent = '0:00';
+      if (durEl) durEl.textContent = '0:00';
+      if (playBtn) playBtn.textContent = '▶';
+    }
+  }
+
+  function renderSecurityLog(events) {
+    const secLog = document.querySelector('.sec-log');
+    if (!secLog) return;
+    if (!events || events.length === 0) {
+      secLog.innerHTML = '<div class="sec-row">[AUDIT] Windows Event Log nominal. Perimeter secure.</div>';
+      return;
+    }
+    secLog.innerHTML = events.map(ev => 
+      `<div class="sec-row${ev.warn ? ' warn' : ''}">${escapeHtml(ev.time)} — ${ev.warn ? '⚠ ' : ''}${escapeHtml(ev.text)}</div>`
+    ).join('');
+  }
+
+  function renderMarketTickers(tickers) {
+    const tickerBar = document.getElementById('tickerBar');
+    if (!tickerBar || !tickers || !tickers.length) return;
+    let html = '';
+    tickers.forEach(t => {
+      const isUp = (t.change_pct || 0) >= 0;
+      const sign = isUp ? '+' : '';
+      const cls = isUp ? 'up' : 'down';
+      html += `<span>${escapeHtml(t.name)} <b>${typeof t.value === 'number' ? t.value.toLocaleString() : t.value}</b> <span class="${cls}">${sign}${(t.change_pct||0).toFixed(2)}%</span></span>`;
+    });
+    tickerBar.innerHTML = html;
+  }
+
+  function renderCryptoData(d) {
+    if (!d || !d.price) return;
+    const obHead = document.querySelector('.ob-head');
+    if (obHead) obHead.textContent = `ORDER BOOK — ${d.symbol || 'BTC/USDT'}`;
+    const obContainer = document.querySelector('[data-view="quant"] .orderbook');
+    if (obContainer && d.asks && d.bids) {
+      let obHtml = `<div class="ob-head">ORDER BOOK — ${escapeHtml(d.symbol || 'BTC/USDT')}</div>`;
+      d.asks.slice(0, 3).reverse().forEach(a => { 
+        obHtml += `<div class="ob-row ask"><span>${Math.round(a.price).toLocaleString()}</span><span>${Number(a.qty).toFixed(3)}</span></div>`; 
+      });
+      d.bids.slice(0, 3).forEach(b => { 
+        obHtml += `<div class="ob-row bid"><span>${Math.round(b.price).toLocaleString()}</span><span>${Number(b.qty).toFixed(3)}</span></div>`; 
+      });
+      obContainer.innerHTML = obHtml;
+    }
+    const pnlRow = document.querySelector('.pnl-row');
+    if (pnlRow) {
+      const chg = d.change_pct !== undefined ? d.change_pct : 0;
+      const dir = chg >= 0 ? 'up' : 'down';
+      const sign = chg >= 0 ? '+' : '';
+      pnlRow.innerHTML = `${escapeHtml(d.symbol || 'BTC/USDT')} · <b>$${Math.round(d.price).toLocaleString()}</b> · <span class="pnl-val ${dir}">${sign}${chg.toFixed(2)}% (24h)</span>`;
+    }
+    if (d.candles && Array.isArray(d.candles)) {
+      drawCandles(d.candles);
+    }
+  }
+
+  function renderHomeDevices(devices) {
+    if (!devices || !Array.isArray(devices)) return;
+    const devList = document.querySelector('.home-devices');
+    let devHtml = '';
+    devices.forEach(dev => {
+      if (dev.type === 'thermostat' || dev.temperature !== undefined) {
+        thermoTemp = parseInt(dev.target || dev.temperature, 10) || 21;
+        drawThermo();
+      } else if (dev.type === 'light') {
+        const toggleLight = document.getElementById('toggleLight');
+        if (toggleLight) toggleLight.classList.toggle('on', dev.state === 'on');
+      } else if (dev.type === 'plug') {
+        const togglePlug = document.getElementById('togglePlug');
+        if (togglePlug) togglePlug.classList.toggle('on', dev.state === 'on');
+        const isOn = dev.state === 'on';
+        devHtml += `<div class="device-row"><span class="dev-dot ${isOn ? 'on' : ''}"></span>${escapeHtml(dev.name || dev.id)}<span class="dev-status">${isOn ? 'ONLINE' : 'STANDBY'}</span></div>`;
+      } else {
+        const isOn = dev.state === 'on' || dev.state === 'connected';
+        devHtml += `<div class="device-row"><span class="dev-dot ${isOn ? 'on' : ''}"></span>${escapeHtml(dev.name || dev.id)}<span class="dev-status">${escapeHtml(String(dev.state || 'idle').toUpperCase())}</span></div>`;
+      }
+    });
+    if (devList && devHtml) devList.innerHTML = devHtml;
+  }
+
+  async function hydrateAllRealData() {
+    try {
+      fetch(`${API}/chat/history`)
+        .then(r => r.json())
+        .then(d => { if (d && d.messages) renderChatHistory(d.messages); })
+        .catch(e => console.warn('History fetch error:', e));
+
+      fetch(`${API}/system-stats`)
+        .then(r => r.json())
+        .then(d => {
+          if (d) {
+            if (d.cpu !== undefined) setGauge(gauges.cpu, d.cpu, '%');
+            if (d.gpu !== undefined) setGauge(gauges.gpu, d.gpu, '%');
+            if (d.ram !== undefined) setGauge(gauges.ram, d.ram, '%');
+            if (d.core_temp !== undefined) {
+              setGauge(gauges.temp, Math.min(100, d.core_temp), '°C');
+              const numEl = gauges.temp ? gauges.temp.querySelector('.gauge-value .num') : null;
+              if (numEl) numEl.textContent = Math.round(d.core_temp);
+            }
+            if (d.net_down_mbps !== undefined) {
+              netHistory.shift();
+              netHistory.push(d.net_down_mbps);
+              drawNet();
+              const netVal = document.getElementById('netVal');
+              if (netVal) netVal.textContent = `${d.net_down_mbps.toFixed(0)} Mb/s ↓ · ${(d.net_up_mbps || 0).toFixed(0)} Mb/s ↑`;
+            }
+            const sysSub = document.getElementById('sysBriefSub');
+            if (sysSub) sysSub.textContent = `RAM: ${d.ram}% · Uptime: ${d.uptime_hours || 0}h`;
+          }
+        })
+        .catch(e => console.warn('System stats error:', e));
+
+      fetch(`${API}/weather`)
+        .then(r => r.json())
+        .then(d => {
+          if (d && d.temp_c) {
+            const wTemp = document.getElementById('weatherTemp');
+            const wDesc = document.getElementById('weatherDesc');
+            if (wTemp) wTemp.textContent = `${d.temp_c}°C / ${d.description || 'Clear'}`;
+            if (wDesc) wDesc.textContent = `Humidity: ${d.humidity || '--'}% · Wind: ${d.wind_kmph || '--'} km/h (${d.city || 'Karachi'})`;
+          }
+        })
+        .catch(e => console.warn('Weather fetch error:', e));
+
+      fetch(`${API}/news`)
+        .then(r => r.json())
+        .then(d => {
+          if (d && d.headlines && d.headlines.length > 0) {
+            const breakingBar = document.getElementById('breakingBar');
+            if (breakingBar) breakingBar.textContent = d.headlines[0].title.toUpperCase();
+            const briefText = document.getElementById('briefText');
+            if (briefText) {
+              let html = `<b>Good to see you, Sir.</b> Real-time telemetry linked.<br/>`;
+              html += `• <b>Top Headlines (${d.source || 'BBC World'}):</b><br/>`;
+              d.headlines.slice(0, 3).forEach(h => {
+                html += `&nbsp;&nbsp;→ ${escapeHtml(h.title)}<br/>`;
+              });
+              briefText.innerHTML = html;
+            }
+          }
+        })
+        .catch(e => console.warn('News fetch error:', e));
+
+      fetch(`${API}/crypto`)
+        .then(r => r.json())
+        .then(d => { if (d && d.price) renderCryptoData(d); })
+        .catch(e => console.warn('Crypto fetch error:', e));
+
+      fetch(`${API}/markets`)
+        .then(r => r.json())
+        .then(d => { if (d && d.tickers && d.tickers.length > 0) renderMarketTickers(d.tickers); })
+        .catch(e => console.warn('Markets fetch error:', e));
+
+      fetch(`${API}/media/now-playing`)
+        .then(r => r.json())
+        .then(d => renderMediaData(d))
+        .catch(e => console.warn('Media fetch error:', e));
+
+      fetch(`${API}/security-log`)
+        .then(r => r.json())
+        .then(d => { if (d && d.events) renderSecurityLog(d.events); })
+        .catch(e => console.warn('Security log fetch error:', e));
+
+      fetch(`${API}/home/devices`)
+        .then(r => r.json())
+        .then(d => { if (d && d.devices) renderHomeDevices(d.devices); })
+        .catch(e => console.warn('Home devices fetch error:', e));
+
+      fetch(`${API}/f1/telemetry`)
+        .then(r => r.json())
+        .then(d => {
+          if (d) {
+            if (d.next_race) {
+              const nr = document.getElementById('f1NextRace');
+              if (nr) nr.textContent = d.next_race;
+            }
+            if (d.last_race) {
+              const lr = document.getElementById('f1LastRace');
+              if (lr) lr.textContent = d.last_race;
+            }
+          }
+        })
+        .catch(e => console.warn('F1 fetch error:', e));
+
+      fetch(`${API}/comms/status`)
+        .then(r => r.json())
+        .then(d => {
+          if (d && d.email_summary) {
+            const es = document.getElementById('emailSub');
+            if (es) es.textContent = d.email_summary;
+          }
+        })
+        .catch(e => console.warn('Comms fetch error:', e));
+
+      fetch(`${API}/earth-tracker`)
+        .then(r => r.json())
+        .then(d => {
+          if (d && d.events && Array.isArray(d.events) && trackerMap) {
+            trackerMarkers.forEach(m => trackerMap.removeLayer(m));
+            trackerMarkers = [];
+            d.events.slice(0, 30).forEach(ev => {
+              const icon = L.divIcon({
+                className:'', iconSize:[10,10], iconAnchor:[5,5],
+                html:`<div class="map-tag-icon selected" style="transform:translate(8px,-4px)"><span class="flight-marker" style="background:#ff5d6c;box-shadow:0 0 10px #ff5d6c"></span><span class="label" style="font-size:9px;color:#ff5d6c;white-space:nowrap;">${escapeHtml(ev.title)}</span></div>`
+              });
+              const m = L.marker([ev.lat, ev.lng], { icon }).addTo(trackerMap);
+              trackerMarkers.push(m);
+            });
+          }
+        })
+        .catch(e => console.warn('Earth tracker fetch error:', e));
+
+    } catch (err) {
+      console.warn('Hydration exception:', err);
+    }
+  }
+
+  function handleSocketMessage(type, d, raw) {
+    if (!type) return;
+
+    // 0. CHAT HISTORY
+    if (type === 'chat.history') {
+      if (d && d.messages) renderChatHistory(d.messages);
+    }
+
+    // 1. STATE TRANSITIONS
+    else if (type === 'state' || type === 'status_change') {
+      const statusStr = typeof d === 'string' ? d : (d.status || d.state || 'online');
+      const upperStatus = statusStr.toUpperCase();
+      
+      const statusLbl = document.querySelector('.status-text') || document.querySelector('.central-status') || document.getElementById('jarvisStatus');
+      if (statusLbl) statusLbl.textContent = upperStatus;
+      
+      const jLive = document.querySelector('.glitch');
+      if (jLive) jLive.textContent = `JARVIS: ${upperStatus}`;
+
+      const homeOrb = document.getElementById('homeOrb');
+      if (homeOrb) {
+        homeOrb.classList.remove('state-listening', 'state-thinking', 'state-speaking');
+        if (statusStr === 'listening') homeOrb.classList.add('state-listening');
+        else if (statusStr === 'thinking') homeOrb.classList.add('state-thinking');
+        else if (statusStr === 'speaking') homeOrb.classList.add('state-speaking');
       }
     }
-    else if (type === 'crypto') {
-      if(d.price){
-        const obHead = document.querySelector('.ob-head');
-        if(obHead) obHead.textContent = `ORDER BOOK — ${d.symbol}`;
-        const obContainer = document.querySelector('[data-view="quant"] .orderbook');
-        if(obContainer && d.asks && d.bids){
-          let obHtml = `<div class="ob-head">ORDER BOOK — ${d.symbol}</div>`;
-          d.asks.slice(0,3).reverse().forEach(a => { obHtml += `<div class="ob-row ask"><span>${Math.round(a.price).toLocaleString()}</span><span>${a.qty.toFixed(3)}</span></div>`; });
-          d.bids.slice(0,3).forEach(b => { obHtml += `<div class="ob-row bid"><span>${Math.round(b.price).toLocaleString()}</span><span>${b.qty.toFixed(3)}</span></div>`; });
-          obContainer.innerHTML = obHtml;
+
+    // 2. TRANSCRIPT STREAM
+    else if (type === 'transcript.partial') {
+      const chatLog = document.getElementById('chatLog') || document.querySelector('.chat-log');
+      if (chatLog && d.text) {
+        let interim = chatLog.querySelector('.line.interim');
+        if (!interim) {
+          interim = document.createElement('div');
+          interim.className = 'line user interim';
+          interim.style.opacity = '0.65';
+          interim.style.fontStyle = 'italic';
+          chatLog.appendChild(interim);
         }
-        const pnlRow = document.querySelector('.pnl-row');
-        if(pnlRow){
-          const dir = d.change_pct >= 0 ? 'up' : 'down';
-          const sign = d.change_pct >= 0 ? '+' : '';
-          pnlRow.innerHTML = `BTC/USDT · <b>$${Math.round(d.price).toLocaleString()}</b> · <span class="pnl-val ${dir}">${sign}${d.change_pct.toFixed(2)}% (24h)</span>`;
+        interim.textContent = d.text + '…';
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+    }
+    else if (type === 'transcript.final') {
+      const chatLog = document.getElementById('chatLog') || document.querySelector('.chat-log');
+      if (chatLog && d.text) {
+        const interim = chatLog.querySelector('.line.interim');
+        if (interim) interim.remove();
+        chatLog.innerHTML += `<div class="line user">${escapeHtml(d.text)}</div>`;
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+    }
+
+    // 3. ASSISTANT STREAM & OUTPUT
+    else if (type === 'assistant.final' || type === 'text_output') {
+      const chatLog = document.getElementById('chatLog') || document.querySelector('.chat-log');
+      if (chatLog) {
+        const text = typeof d === 'string' ? d : (d.text || '');
+        if (text) {
+          const isUser = text.startsWith("User") || (type === 'text_output' && text.includes(" : ") === false && !text.startsWith("JARVIS"));
+          const className = isUser ? 'user' : 'assistant';
+          chatLog.innerHTML += `<div class="line ${className}">${escapeHtml(text)}</div>`;
+          chatLog.scrollTop = chatLog.scrollHeight;
         }
       }
     }
-    else if (type === 'f1_telemetry') {
-      if(document.getElementById('panelData').classList.contains('show')){
-        setRpm(d.rpm_pct);
-        document.getElementById('gearNum').textContent = d.gear;
-        document.getElementById('speedNum').textContent = d.speed;
+
+    // 4. TOOL LIFECYCLE
+    else if (type === 'tool.start') {
+      const chatLog = document.getElementById('chatLog') || document.querySelector('.chat-log');
+      if (chatLog) {
+        const toolName = d.tool || d.name || 'system_tool';
+        chatLog.innerHTML += `<div class="line tool" style="color:var(--cyan); font-size:0.85em; font-family:var(--font-mono); margin:2px 0;">⚡ EXECUTING: ${escapeHtml(toolName)}...</div>`;
+        chatLog.scrollTop = chatLog.scrollHeight;
       }
     }
-    else if (type === 'security_log') {
-      if(d.events && d.events.length > 0){
-        const secLog = document.querySelector('.sec-log');
-        if(secLog) secLog.innerHTML = d.events.map(ev => `<div class="sec-row${ev.warn ? ' warn' : ''}">${ev.time} — ${ev.warn ? '⚠ ' : ''}${ev.text}</div>`).join('');
+    else if (type === 'tool.result') {
+      const chatLog = document.getElementById('chatLog') || document.querySelector('.chat-log');
+      if (chatLog) {
+        const toolName = d.tool || d.name || 'system_tool';
+        const ok = d.ok !== false;
+        const color = ok ? '#3fe08a' : '#ff5d6c';
+        const label = ok ? 'SUCCESS' : (d.error || 'FAILED');
+        chatLog.innerHTML += `<div class="line tool-res" style="color:${color}; font-size:0.85em; font-family:var(--font-mono); margin:2px 0;">${ok ? '✓' : '✗'} ${escapeHtml(toolName)}: ${escapeHtml(label)}</div>`;
+        chatLog.scrollTop = chatLog.scrollHeight;
       }
+    }
+
+    // 5. UI PANEL SWITCHING
+    else if (type === 'ui.open' || type === 'widget_command') {
+      const target = d.widget || (d.action === 'open' ? d.target : (d.action === 'set_core_color' ? null : d));
+      if (d.action === "set_core_color" && d.color) {
+        document.documentElement.style.setProperty('--color-primary', d.color);
+        return;
+      }
+      if (target) {
+        const t = String(target).toLowerCase();
+        if (t === 'vr' || t === 'map' || t === 'tracker' || t === 'schematic') {
+          const vrBtn = document.querySelector('.shell-controls button[data-mode="vr"]');
+          if (vrBtn) vrBtn.click();
+          if (t === 'map' || t === 'tracker' || t === 'schematic') {
+            const subBtn = document.querySelector(`#vrSubControls button[data-vrmode="${t}"]`);
+            if (subBtn) subBtn.click();
+          }
+        } else {
+          const wBtn = document.querySelector('.shell-controls button[data-mode="widget"]');
+          if (wBtn) wBtn.click();
+          if (typeof setMode === 'function') {
+            revealDockPage(t);
+            setMode(t);
+          }
+        }
+      }
+    }
+
+    // 6. DIAGNOSTICS & SYSTEM TELEMETRY
+    else if (type === 'diagnostics') {
+      if (d.cpu !== undefined) setGauge(gauges.cpu, d.cpu, '%');
+      if (d.gpu !== undefined) setGauge(gauges.gpu, d.gpu, '%');
+      if (d.ram !== undefined) setGauge(gauges.ram, d.ram, '%');
+      if (d.core_temp !== undefined) {
+        const tempPct = Math.min(100, (d.core_temp / 100) * 100);
+        setGauge(gauges.temp, tempPct, '°C');
+        const numEl = gauges.temp ? gauges.temp.querySelector('.gauge-value .num') : null;
+        if (numEl) numEl.textContent = Math.round(d.core_temp);
+      }
+      if (d.net_down_mbps !== undefined) {
+        netHistory.shift();
+        netHistory.push(d.net_down_mbps);
+        drawNet();
+        const netVal = document.getElementById('netVal');
+        if (netVal) netVal.textContent = `${d.net_down_mbps.toFixed(0)} Mb/s ↓ · ${(d.net_up_mbps || 0).toFixed(0)} Mb/s ↑`;
+      }
+    }
+
+    // 7. SMART HOME & IOT MATRIX
+    else if (type === 'home.devices') {
+      renderHomeDevices(d.devices);
+    }
+
+    // 8. F1 TELEMETRY
+    else if (type === 'f1' || type === 'f1_telemetry') {
+      if (d.rpm_pct !== undefined) setRpm(d.rpm_pct);
+      if (d.gear !== undefined) {
+        const gearEl = document.getElementById('gearNum');
+        if (gearEl) gearEl.textContent = d.gear;
+      }
+      if (d.speed !== undefined) {
+        const speedEl = document.getElementById('speedNum');
+        if (speedEl) speedEl.textContent = d.speed;
+      }
+      const lapEl = document.getElementById('f1LapInfo') || document.querySelector('.lap-info');
+      if (lapEl) {
+        if (d.session === 'STANDBY' || d.lap === 0) {
+          lapEl.textContent = `FIA PIT WALL TELEMETRY: STANDBY · CALENDAR SYNCHRONIZED`;
+        } else {
+          lapEl.textContent = `LAP ${d.lap} · GAP ${d.gap || '+0.0s'} · LEADER: ${d.leader || 'VER'}`;
+        }
+      }
+      if (d.next_race) {
+        const nrEl = document.getElementById('f1NextRace');
+        if (nrEl) nrEl.textContent = d.next_race;
+      }
+      if (d.last_race) {
+        const lrEl = document.getElementById('f1LastRace');
+        if (lrEl) lrEl.textContent = d.last_race;
+      }
+    }
+
+    // 8.5 COMMS & PHONELINK
+    else if (type === 'comms' || type === 'comms.status') {
+      if (d && d.email_summary) {
+        const es = document.getElementById('emailSub');
+        if (es) es.textContent = d.email_summary;
+      }
+    }
+
+    // 9. QUANT & MARKETS
+    else if (type === 'quant' || type === 'crypto') {
+      renderCryptoData(d);
     }
     else if (type === 'markets') {
-      if(d.tickers && d.tickers.length > 0){
-        document.querySelector('.ticker-bar').innerHTML = d.tickers.map(t => {
-          const dir = t.change_pct >= 0 ? 'up' : 'down';
-          const sign = t.change_pct >= 0 ? '+' : '';
-          return `<span>${t.name} <b>${t.value.toLocaleString()}</b> <span class="${dir}">${sign}${t.change_pct}%</span></span>`;
-        }).join('');
-      }
+      if (d && d.tickers) renderMarketTickers(d.tickers);
     }
-    else if (type === 'briefing') {
-      const weather = d.weather || {};
-      const news = d.news || {};
-      const briefText = document.querySelector('.brief-text');
-      if(briefText){
-        let html = `<b>Good to see you, Sir.</b> I am online and ready.<br/>`;
-        if(weather.temp_c) html += `• Weather in ${weather.city}: ${weather.description}, ${weather.temp_c}°C (feels like ${weather.feels_like_c}°C).<br/>`;
-        if(news.headlines && news.headlines.length > 0){
-          html += `• <b>Top Headlines:</b><br/>`;
-          news.headlines.slice(0,3).forEach(h => html += `&nbsp;&nbsp;→ ${h.title}<br/>`);
-        }
-        briefText.innerHTML = html;
+
+    // 10. EARTH TRACKER & ORBITAL RADAR
+    else if (type === 'earth.track' || type === 'earth_tracker') {
+      const tgtInfo = document.getElementById('radarTargetInfo');
+      if (tgtInfo) {
+        const tgtName = d.target || 'ISS';
+        const alt = Math.round(d.altitude_km || 408);
+        const vel = Math.round(d.velocity_kmh || 27600);
+        const brg = Math.round(d.bearing || 45);
+        tgtInfo.textContent = `TARGET: ${tgtName} (${alt} KM) · VEL: ${vel} KM/H · BEARING: ${brg}°`;
       }
-      if(news.headlines && news.headlines.length > 0){
-        const breakingBar = document.querySelector('.breaking-bar');
-        if(breakingBar) breakingBar.textContent = news.headlines[0].title.toUpperCase();
+      if (d.blips && Array.isArray(d.blips)) {
+        radarBlips = d.blips;
       }
-    }
-    else if (type === 'earth_tracker') {
-      if(trackerMap && d.events) {
+      if (trackerMap && d.events && Array.isArray(d.events)) {
         trackerMarkers.forEach(m => trackerMap.removeLayer(m));
         trackerMarkers = [];
         d.events.forEach(ev => {
           const icon = L.divIcon({
             className:'', iconSize:[10,10], iconAnchor:[5,5],
-            html:`<div class="map-tag-icon selected" style="transform:translate(8px,-4px)"><span class="flight-marker" style="background:#ff5d6c;box-shadow:0 0 10px #ff5d6c"></span><span class="label" style="font-size:9px;color:#ff5d6c;white-space:nowrap;">${ev.title}</span></div>`
+            html:`<div class="map-tag-icon selected" style="transform:translate(8px,-4px)"><span class="flight-marker" style="background:#ff5d6c;box-shadow:0 0 10px #ff5d6c"></span><span class="label" style="font-size:9px;color:#ff5d6c;white-space:nowrap;">${escapeHtml(ev.title)}</span></div>`
           });
           const m = L.marker([ev.lat, ev.lng], { icon }).addTo(trackerMap);
           trackerMarkers.push(m);
         });
       }
     }
+
+    // 11. DYNAMIC RESULT FALLBACK
+    else if (type === 'dynamic.result') {
+      if (window.JARVIS && typeof window.JARVIS.showDynamicResult === 'function') {
+        window.JARVIS.showDynamicResult(d.title, d.html);
+      }
+    }
+
+    // 12. SECURITY LOG
+    else if (type === 'security.log' || type === 'security_log') {
+      if (d && d.events) renderSecurityLog(d.events);
+    }
+
+    // 13. MEDIA PLAYBACK
+    else if (type === 'media') {
+      renderMediaData(d);
+    }
+
+    // 14. BRIEFING & NEWS
+    else if (type === 'briefing') {
+      const weather = d.weather || {};
+      const news = d.news || {};
+      const briefText = document.getElementById('briefText');
+      if (briefText) {
+        let html = `<b>Good to see you, Sir.</b> Telemetry online.<br/>`;
+        if (weather.temp_c) html += `• Weather in ${escapeHtml(weather.city || 'Karachi')}: ${escapeHtml(weather.description || 'Clear')}, ${weather.temp_c}°C (feels like ${weather.feels_like_c || weather.temp_c}°C).<br/>`;
+        else if (typeof weather === 'string') html += `• Weather: ${escapeHtml(weather)}.<br/>`;
+        if (news.headlines && news.headlines.length > 0) {
+          html += `• <b>Top Headlines:</b><br/>`;
+          news.headlines.slice(0, 3).forEach(h => {
+            html += `&nbsp;&nbsp;→ ${escapeHtml(h.title)}<br/>`;
+          });
+        } else if (Array.isArray(news) && news.length > 0) {
+          html += `• <b>Top Headlines:</b><br/>`;
+          news.slice(0, 3).forEach(h => {
+            html += `&nbsp;&nbsp;→ ${escapeHtml(h)}<br/>`;
+          });
+        }
+        briefText.innerHTML = html;
+      }
+      if (news.headlines && news.headlines.length > 0) {
+        const breakingBar = document.getElementById('breakingBar');
+        if (breakingBar) breakingBar.textContent = news.headlines[0].title.toUpperCase();
+      } else if (Array.isArray(news) && news.length > 0) {
+        const breakingBar = document.getElementById('breakingBar');
+        if (breakingBar) breakingBar.textContent = news[0].toUpperCase();
+      }
+    }
+
+    // 15. SWARM MESSAGE
+    else if (type === 'swarm_message') {
+      const chatLog = document.getElementById('chatLog') || document.querySelector('.chat-log');
+      if (chatLog && d.message) {
+        chatLog.innerHTML += `<div class="line" style="color: #888; font-size: 0.9em; font-style: italic;">[${escapeHtml(d.agent || 'AGENT')}] ${escapeHtml(d.message)}</div>`;
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+    }
   }
 
-  // Connect on load
+  // Connect on load and trigger hydration
   window.JARVIS_SOCKET = connectWebSocket;
   connectWebSocket();
+  hydrateAllRealData();
+
+  /* ============================================================
+     Orbital Radar Sweep Animation for #radarSweepCanvas
+     ============================================================ */
+  let radarCanvas = document.getElementById('radarSweepCanvas');
+  let radarCtx = radarCanvas ? radarCanvas.getContext('2d') : null;
+  let radarAngle = 0;
+  let radarBlips = [
+    { id: 'iss', name: 'ISS (ZARYA)', bearing: 42, range_km: 408 },
+    { id: 'hst', name: 'HST (HUBBLE)', bearing: 155, range_km: 535 },
+    { id: 'tiangong', name: 'TIANGONG', bearing: 280, range_km: 390 }
+  ];
+
+  function drawRadarSweep() {
+    if (!radarCanvas || !radarCtx) return;
+    const w = radarCanvas.clientWidth || 300;
+    const h = radarCanvas.clientHeight || 200;
+    if (radarCanvas.width !== w || radarCanvas.height !== h) {
+      radarCanvas.width = w;
+      radarCanvas.height = h;
+    }
+
+    const cx = w / 2;
+    const cy = h / 2;
+    const maxR = Math.min(cx, cy) * 0.88;
+
+    // Background phosphor persistence fade
+    radarCtx.fillStyle = 'rgba(7, 10, 13, 0.12)';
+    radarCtx.fillRect(0, 0, w, h);
+
+    // Range rings
+    radarCtx.lineWidth = 1;
+    [0.33, 0.66, 1.0].forEach((ratio, idx) => {
+      const r = maxR * ratio;
+      radarCtx.beginPath();
+      radarCtx.arc(cx, cy, r, 0, Math.PI * 2);
+      radarCtx.strokeStyle = 'rgba(77, 216, 255, 0.25)';
+      radarCtx.stroke();
+
+      radarCtx.fillStyle = 'rgba(77, 216, 255, 0.45)';
+      radarCtx.font = '8px monospace';
+      radarCtx.fillText(`${(ratio * 500).toFixed(0)} KM`, cx + 4, cy - r + 10);
+    });
+
+    // Crosshairs
+    radarCtx.strokeStyle = 'rgba(77, 216, 255, 0.2)';
+    radarCtx.beginPath();
+    radarCtx.moveTo(cx - maxR, cy); radarCtx.lineTo(cx + maxR, cy);
+    radarCtx.moveTo(cx, cy - maxR); radarCtx.lineTo(cx, cy + maxR);
+    radarCtx.stroke();
+
+    // Rotating Sweep Cone (35 deg trailing gradient)
+    const sweepSegments = 24;
+    for (let i = 0; i < sweepSegments; i++) {
+      const a1 = radarAngle - (i / sweepSegments) * (Math.PI / 4.5);
+      const a2 = radarAngle - ((i + 1) / sweepSegments) * (Math.PI / 4.5);
+      const alpha = 0.28 * (1 - i / sweepSegments);
+      radarCtx.beginPath();
+      radarCtx.moveTo(cx, cy);
+      radarCtx.arc(cx, cy, maxR, a2, a1);
+      radarCtx.closePath();
+      radarCtx.fillStyle = `rgba(77, 216, 255, ${alpha.toFixed(3)})`;
+      radarCtx.fill();
+    }
+
+    // Leading sweep line
+    radarCtx.beginPath();
+    radarCtx.moveTo(cx, cy);
+    radarCtx.lineTo(cx + Math.cos(radarAngle) * maxR, cy + Math.sin(radarAngle) * maxR);
+    radarCtx.strokeStyle = '#4dd8ff';
+    radarCtx.lineWidth = 1.5;
+    radarCtx.stroke();
+
+    // Draw Target Blips
+    radarBlips.forEach(blip => {
+      const bRad = (blip.bearing * Math.PI) / 180;
+      const bDist = Math.min(1.0, (blip.range_km || 300) / 500) * maxR;
+      const bx = cx + Math.cos(bRad) * bDist;
+      const by = cy + Math.sin(bRad) * bDist;
+
+      let diff = Math.abs(radarAngle - bRad) % (Math.PI * 2);
+      if (diff > Math.PI) diff = (Math.PI * 2) - diff;
+      const isPinged = diff < 0.25;
+
+      radarCtx.beginPath();
+      radarCtx.arc(bx, by, isPinged ? 4 : 2.5, 0, Math.PI * 2);
+      radarCtx.fillStyle = isPinged ? '#ffffff' : '#3fe08a';
+      radarCtx.fill();
+
+      if (isPinged) {
+        radarCtx.beginPath();
+        radarCtx.arc(bx, by, 8, 0, Math.PI * 2);
+        radarCtx.strokeStyle = 'rgba(63, 224, 138, 0.6)';
+        radarCtx.stroke();
+      }
+
+      radarCtx.fillStyle = isPinged ? '#4dd8ff' : 'rgba(77, 216, 255, 0.6)';
+      radarCtx.font = '8px monospace';
+      radarCtx.fillText(blip.name, bx + 6, by - 3);
+    });
+
+    radarAngle = (radarAngle + 0.035) % (Math.PI * 2);
+    requestAnimationFrame(drawRadarSweep);
+  }
+  requestAnimationFrame(drawRadarSweep);
 
   /* ============================================================
      1. Diagnostics Helpers
@@ -1250,27 +1829,166 @@
   }
 
   /* ============================================================
-     2. Smart Home
+     2. Smart Home Controls (Live Backend Linked)
      ============================================================ */
   document.querySelectorAll('.toggle').forEach(t=>{
-    t.addEventListener('click', ()=>t.classList.toggle('on')); // Keep optimistic UI
+    t.addEventListener('click', ()=>{
+      t.classList.toggle('on');
+      const dev = t.dataset.device || 'plug_1';
+      const newState = t.classList.contains('on') ? 'on' : 'off';
+      fetch(`${API}/home/toggle`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device: dev, state: newState })
+      }).catch(err => console.warn('Toggle error:', err));
+    });
   });
+
   const THERMO_R = 50, THERMO_C = 2*Math.PI*THERMO_R;
   let thermoTemp = 23;
   function drawThermo(){
     const pct = Math.max(0, Math.min(1, (thermoTemp-16)/(30-16)));
     const fill = document.getElementById('thermoFill');
-    fill.style.strokeDasharray = `${THERMO_C} ${THERMO_C}`;
-    fill.style.strokeDashoffset = THERMO_C*(1-pct);
-    document.getElementById('thermoTemp').textContent = thermoTemp+'°';
+    if (fill) {
+      fill.style.strokeDasharray = `${THERMO_C} ${THERMO_C}`;
+      fill.style.strokeDashoffset = THERMO_C*(1-pct);
+    }
+    const tt = document.getElementById('thermoTemp');
+    if (tt) tt.textContent = thermoTemp+'°';
   }
   drawThermo();
+
   document.querySelectorAll('.thermo-btns button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       thermoTemp = Math.max(16, Math.min(30, thermoTemp + parseInt(btn.dataset.delta,10)));
       drawThermo();
+      fetch(`${API}/home/thermostat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ temperature: thermoTemp })
+      }).catch(err => console.warn('Thermostat adjustment error:', err));
     });
   });
+
+  /* ============================================================
+     2.1 Music Player Controls (Spotify / System Audio)
+     ============================================================ */
+  const btnPlay = document.getElementById('btnPlay');
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+  const btnPlaySearch = document.getElementById('btnPlaySearch');
+  const musicSearchInput = document.getElementById('musicSearchInput');
+
+  function sendMediaControl(action) {
+    fetch(`${API}/media/control`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: action })
+    }).catch(e => console.warn('Media control error:', e));
+  }
+
+  if (btnPlay) btnPlay.addEventListener('click', () => sendMediaControl('play_pause'));
+  if (btnPrev) btnPrev.addEventListener('click', () => sendMediaControl('prev'));
+  if (btnNext) btnNext.addEventListener('click', () => sendMediaControl('next'));
+
+  function playTrackQuery() {
+    if (!musicSearchInput) return;
+    const q = musicSearchInput.value.trim();
+    if (!q) return;
+    const statusEl = document.getElementById('musicStatus');
+    if (statusEl) statusEl.textContent = 'STREAMING...';
+    fetch(`${API}/media/play`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: q })
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (statusEl) statusEl.textContent = d.ok ? 'PLAYING' : 'IDLE';
+    })
+    .catch(e => console.warn('Media play error:', e));
+  }
+
+  if (btnPlaySearch) btnPlaySearch.addEventListener('click', playTrackQuery);
+  if (musicSearchInput) musicSearchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') playTrackQuery(); });
+
+  /* ============================================================
+     2.2 Local Coder & Sandbox Execution
+     ============================================================ */
+  const btnRunCode = document.getElementById('btnRunCode');
+  const coderTextarea = document.getElementById('coderTextarea');
+  const coderOutput = document.getElementById('coderOutput');
+  const coderStatus = document.getElementById('coderStatus');
+  const coderProgress = document.getElementById('coderProgress');
+
+  if (btnRunCode && coderTextarea) {
+    btnRunCode.addEventListener('click', async () => {
+      const code = coderTextarea.value.trim();
+      if (!code) return;
+      if (coderStatus) coderStatus.textContent = 'EXECUTING IN ISOLATED SANDBOX...';
+      if (coderProgress) {
+        coderProgress.style.transition = 'width 0.4s ease';
+        coderProgress.style.width = '70%';
+      }
+      try {
+        const res = await fetch(`${API}/coder/run`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: code })
+        });
+        const d = await res.json();
+        if (coderProgress) {
+          coderProgress.style.width = '100%';
+          setTimeout(() => { if (coderProgress) coderProgress.style.width = '0%'; }, 1000);
+        }
+        if (coderOutput) {
+          coderOutput.textContent = d.output || (d.ok ? '[SUCCESS]' : `[ERROR] ${d.error}`);
+        }
+        if (coderStatus) {
+          coderStatus.textContent = d.ok ? 'EXECUTION COMPLETED SUCCESSFULLY' : 'EXECUTION FAILED (TRACEBACK RETURNED)';
+        }
+      } catch (err) {
+        if (coderStatus) coderStatus.textContent = `SANDBOX ERROR: ${err}`;
+      }
+    });
+  }
+
+  /* ============================================================
+     2.3 Comms & PhoneLink Controls
+     ============================================================ */
+  const btnPhoneBeam = document.getElementById('btnPhoneBeam');
+  const phoneLinkSub = document.getElementById('phoneLinkSub');
+  if (btnPhoneBeam) {
+    btnPhoneBeam.addEventListener('click', async () => {
+      if (phoneLinkSub) phoneLinkSub.textContent = 'GENERATING QR TRANSFER...';
+      try {
+        const res = await fetch(`${API}/phonelink/beam`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        const d = await res.json();
+        if (phoneLinkSub) phoneLinkSub.textContent = d.ok ? '✓ QR Code Generated & Opened on Desktop' : `Error: ${d.error}`;
+      } catch (e) {
+        if (phoneLinkSub) phoneLinkSub.textContent = `Beam failed: ${e}`;
+      }
+    });
+  }
+
+  const btnCheckEmail = document.getElementById('btnCheckEmail');
+  const emailSub = document.getElementById('emailSub');
+  if (btnCheckEmail) {
+    btnCheckEmail.addEventListener('click', async () => {
+      if (emailSub) emailSub.textContent = 'CHECKING MAILBOXES...';
+      try {
+        const res = await fetch(`${API}/comms/status`);
+        const d = await res.json();
+        if (emailSub) emailSub.textContent = d.email_summary || 'No unread emails';
+      } catch (e) {
+        if (emailSub) emailSub.textContent = `Check failed: ${e}`;
+      }
+    });
+  }
 
   /* ============================================================
      3. F1 Helpers & Candlestick
@@ -1298,21 +2016,31 @@
     }
   }
 
-  function drawCandles(){
+  function drawCandles(candles){
     const svg = document.getElementById('candleSvg');
-    if(!svg || svg.childElementCount) return; // Only draw once
-    let price = 40, html = '';
-    for(let i=0;i<24;i++){
-      const open = price, close = open + (Math.random()-0.5)*10;
-      const high = Math.max(open,close) + Math.random()*4, low = Math.min(open,close) - Math.random()*4;
-      const x = i*9 + 4, up = close >= open, color = up ? '#3fe08a' : '#ff5d6c';
-      html += `<line x1="${x}" y1="${80-high}" x2="${x}" y2="${80-low}" stroke="${color}" stroke-width="1"/>`;
-      html += `<rect x="${x-2.5}" y="${80-Math.max(open,close)}" width="5" height="${Math.max(1,Math.abs(open-close))}" fill="${color}"/>`;
-      price = close;
+    if(!svg) return;
+    if(!candles || !candles.length){
+      svg.innerHTML = '<text x="110" y="45" fill="rgba(255,255,255,0.4)" font-size="10" text-anchor="middle" font-family="var(--font-mono)">AWAITING MARKET FEED</text>';
+      return;
     }
+    let html = '';
+    const minVal = Math.min(...candles.map(c => c.low || c.open || 0));
+    const maxVal = Math.max(...candles.map(c => c.high || c.close || 1));
+    const range = (maxVal - minVal) || 1;
+    candles.slice(-24).forEach((c, i) => {
+      const openY = 70 - (((c.open - minVal) / range) * 55);
+      const closeY = 70 - (((c.close - minVal) / range) * 55);
+      const highY = 70 - (((c.high - minVal) / range) * 55);
+      const lowY = 70 - (((c.low - minVal) / range) * 55);
+      const x = i * 9 + 8;
+      const up = (c.close || 0) >= (c.open || 0);
+      const color = up ? '#3fe08a' : '#ff5d6c';
+      html += `<line x1="${x}" y1="${highY}" x2="${x}" y2="${lowY}" stroke="${color}" stroke-width="1"/>`;
+      html += `<rect x="${x-2.5}" y="${Math.min(openY, closeY)}" width="5" height="${Math.max(1, Math.abs(openY - closeY))}" fill="${color}"/>`;
+    });
     svg.innerHTML = html;
   }
-  drawCandles();
+  drawCandles(null);
 
   /* ============================================================
      4. Camera — getUserMedia
@@ -1340,11 +2068,30 @@
      5. Dynamic fallback panel API & Chat logic
      ============================================================ */
   window.JARVIS = window.JARVIS || {};
+  function sanitizeDynamicHtml(input) {
+    if (!input) return '';
+    let clean = String(input)
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+      .replace(/<link\b[^>]*>/gi, '')
+      .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
+      .replace(/\s+on\w+="[^"]*"/gi, '')
+      .replace(/\s+on\w+='[^']*'/gi, '')
+      .replace(/href\s*=\s*["']javascript:[^"']*["']/gi, 'href="#"');
+    return clean;
+  }
+
   window.JARVIS.showDynamicResult = function(title, html){
     const tab = document.querySelector('#panelDynamic .panel-tab');
-    if(tab) tab.innerHTML = '<span class="sq"></span>' + (title || '[DYNAMIC_QUERY_RESULT]');
+    if(tab) tab.innerHTML = '<span class="sq"></span>' + escapeHtml(title || '[DYNAMIC_QUERY_RESULT]');
     const body = document.getElementById('dynamicBody');
-    if(body) body.innerHTML = html || ''; // Backend should sanitize this
+    if(body) body.innerHTML = sanitizeDynamicHtml(html);
+    
+    // Switch to widget screen if in VR HUD
+    const wBtn = document.querySelector('.shell-controls button[data-mode="widget"]');
+    if (wBtn && !wBtn.classList.contains('active')) wBtn.click();
+    
     revealDockPage('dynamic');
     setMode('dynamic');
   };
@@ -1394,6 +2141,37 @@
     
     chatSendBtn.addEventListener('click', sendMsg);
     chatInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMsg(); });
+  }
+
+  const genUiInput = document.getElementById('genUiInput');
+  const genUiBtn = document.getElementById('genUiBtn');
+  if (genUiInput && genUiBtn) {
+    const triggerGenUi = async () => {
+      const q = genUiInput.value.trim();
+      if (!q) return;
+      genUiInput.value = '';
+      const body = document.getElementById('dynamicBody');
+      if (body) body.innerHTML = '<p style="color:var(--cyan); font-family:var(--font-mono);">[SYNTHESIZING UI COMPONENT...]</p>';
+      revealDockPage('dynamic');
+      setMode('dynamic');
+      try {
+        const res = await fetch(`${API}/chat`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({text: q})
+        });
+        const data = await res.json();
+        if (data.dynamic_result) {
+          window.JARVIS.showDynamicResult(data.dynamic_result.title, data.dynamic_result.html);
+        } else if (data.text) {
+          window.JARVIS.showDynamicResult('INFO // ' + q.slice(0, 30).toUpperCase(), '<p>' + escapeHtml(data.text) + '</p>');
+        }
+      } catch (err) {
+        if (body) body.innerHTML = '<p style="color:var(--red);">[GENERATION FAILED: ' + escapeHtml(err.message) + ']</p>';
+      }
+    };
+    genUiBtn.addEventListener('click', triggerGenUi);
+    genUiInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') triggerGenUi(); });
   }
 
   /* ============================================================

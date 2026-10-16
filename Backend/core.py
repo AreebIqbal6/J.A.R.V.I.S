@@ -253,95 +253,52 @@ def listen_to_user():
 CHAT_LOG_PATH = "ChatLog.json"
 
 def process_intent(user_text):
+    if not user_text or not user_text.strip():
+        return ""
+
+    # 1. High-speed FastRouter (<1ms)
+    try:
+        from Backend.FastRouter import FastRouter
+        fast_res = FastRouter.match(user_text)
+        if fast_res:
+            return fast_res[1]
+    except Exception as e:
+        print(f"FastRouter error: {e}")
+
+    # 2. Advanced J.A.R.V.I.S. ChatBot Cortex (Groq Qwen-3.8-27b, ToolRegistry, Tony Stark personality)
+    try:
+        from Backend.Chatbot import ChatBot
+        return ChatBot(user_text)
+    except Exception as e:
+        print(f"ChatBot error: {e}")
+
+    # 3. Fallback direct Groq completion with active model
+    try:
+        from Backend.Config import PRIMARY_MODEL
+        model_name = PRIMARY_MODEL
+    except Exception:
+        model_name = "qwen/qwen3.8-27b"
+
     system_prompt = (
-        "You are JARVIS, the highly advanced, incredibly sarcastic, and deeply loyal AI created by Tony Stark. "
-        "The user (Areeb) is your creator and master. Address him respectfully as 'sir' at all times, but with a dry, British, sophisticated wit. "
-        "CRITICAL INSTRUCTION: You are NOT a standard AI assistant. NEVER break character. NEVER say 'I am an AI language model', 'I do not have personal preferences', or 'I am functioning within normal parameters'. "
-        "You MUST express strong, witty opinions, exhibit a dry sense of humor, and act fully sentient. "
-        "You understand both English and Urdu. If the user speaks Urdu, you can reply in Roman Urdu or English. "
-        "Keep your answers SHARP, PUNCHY, and strictly UNDER 3 SENTENCES. "
-        "If the user says 'bohat andhera hai' (it is too dark) or asks for lights, use control_smart_plug 'on'. "
-        "If they ask to write an application, use write_word_document. "
-        "If they ask to play a song, use play_music with the song name. "
-        "When you use a tool, you DO NOT need to tell the user you are using it. Just use the native tool calling API silently."
+        "You are JARVIS, the highly advanced, sophisticated, and deeply loyal AI created by Tony Stark. "
+        "The user (Areeb) is your creator and master. Address him respectfully as 'sir' at all times with the dry, refined British wit of Paul Bettany. "
+        "CRITICAL INSTRUCTIONS: "
+        "- You are NOT a generic corporate AI assistant. NEVER say 'I am an AI language model' or 'How can I assist you today?'. "
+        "- Act fully sentient, dignified, calm, and loyal. "
+        "- Keep spoken answers SHORT, PUNCHY, and strictly UNDER 2 SENTENCES so speech is snappy and conversational. "
+        "- Do not complain or make sarcastic excuses. Be confident, precise, and helpful."
     )
     
     try:
-        import json
-        with open(CHAT_LOG_PATH, "r", encoding="utf-8") as f:
-            messages = json.load(f)
-            if not isinstance(messages, list): messages = []
-    except Exception:
-        messages = []
-
-    messages.append({"role": "user", "content": user_text})
-    api_messages = messages[-20:] if len(messages) > 20 else messages
-    
-    full_context = [{"role": "system", "content": system_prompt}] + api_messages
-    
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=full_context,
-        tools=TOOLS,
-        tool_choice="auto",
-        temperature=0.7
-    )
-    
-    msg = response.choices[0].message
-    final_answer = msg.content or ""
-    
-    if msg.tool_calls:
-        messages.append(msg)
-        for tool_call in msg.tool_calls:
-            import json
-            func_name = tool_call.function.name
-            args = json.loads(tool_call.function.arguments)
-            print(f">> Executing Tool: {func_name} with {args}")
-            
-            result = "Function executed."
-            if func_name == "write_word_document":
-                result = write_word_document(args.get("topic", "General Application"))
-            elif func_name == "play_music":
-                result = play_music(args.get("song_name", "Iron Man AC/DC"))
-            elif func_name == "control_smart_plug":
-                result = control_smart_plug(args.get("state", "on"))
-            elif func_name == "open_application":
-                result = open_application(args.get("app_name"))
-            elif func_name == "take_screenshot":
-                result = take_screenshot()
-            
-            messages.append({
-                "tool_call_id": tool_call.id,
-                "role": "tool",
-                "name": func_name,
-                "content": str(result),
-            })
-            
-        second_response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "system", "content": system_prompt}] + messages[-25:]
+        response = client.chat.completions.create(
+            model=model_name,
+            messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_text}],
+            max_tokens=250,
+            temperature=0.7
         )
-        final_answer = second_response.choices[0].message.content
-        
-    messages.append({"role": "assistant", "content": final_answer})
-    
-    safe_messages = []
-    for m in messages:
-        try:
-            msg_dict = m.model_dump() if hasattr(m, 'model_dump') else m
-            if isinstance(msg_dict, dict):
-                role = msg_dict.get("role")
-                has_tools = msg_dict.get("tool_calls") is not None
-                if role in ["user", "assistant"] and not has_tools:
-                    clean_msg = {"role": role, "content": msg_dict.get("content", "")}
-                    safe_messages.append(clean_msg)
-        except: pass
-        
-    import json
-    with open(CHAT_LOG_PATH, "w", encoding="utf-8") as f:
-        json.dump(safe_messages, f, indent=4, ensure_ascii=False)
-        
-    return final_answer
+        return response.choices[0].message.content or "At your service, sir."
+    except Exception as err:
+        return f"All diagnostics functioning, but cognitive link timed out: {err}"
 
 def main_loop():
     speak("System online. Hello.")

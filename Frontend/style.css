@@ -259,3 +259,193 @@ button:hover { background: rgba(34, 211, 238, 0.18); }
   .hero-copy { padding: 12px 8px 10px; text-align: center; }
   .topline { font-size: 0.62rem; letter-spacing: 0.12em; }
 }
+
+/* ==========================================================================
+   GENERATIVE UI & COMPLETE SCREEN MODULE EXTENSIONS
+   ========================================================================== */
+.gen-bar {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(34, 211, 238, 0.38);
+  border-radius: 999px;
+  padding: 6px 12px;
+  box-shadow: 0 0 24px rgba(34, 211, 238, 0.15);
+}
+.gen-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 8px 14px;
+  outline: none;
+}
+.gen-input::placeholder { color: var(--muted); opacity: 0.8; }
+.gen-btn {
+  background: linear-gradient(90deg, #0ea5e9, var(--cyan));
+  border: none;
+  color: #020617;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  padding: 8px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.gen-btn:hover {
+  box-shadow: 0 0 16px var(--cyan);
+  transform: scale(1.02);
+}
+
+.dynamic-section {
+  margin: 32px 0 20px;
+}
+.dynamic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 18px;
+  margin-top: 16px;
+}
+.dynamic-card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.88), rgba(2, 6, 23, 0.78));
+  border: 1px solid rgba(34, 211, 238, 0.35);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.1);
+  animation: cardFadeIn 0.4s ease forwards;
+}
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.dynamic-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.16);
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+.dynamic-card-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--cyan);
+  text-transform: uppercase;
+}
+.dynamic-card-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 2px 8px;
+  cursor: pointer;
+  box-shadow: none;
+}
+.dynamic-card-close:hover { color: #ff5d6c; }
+.dynamic-card-body {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text);
+  max-height: 280px;
+  overflow-y: auto;
+}
+.dynamic-card-body b, .dynamic-card-body strong { color: #fff; }
+.dynamic-card-body code { background: rgba(34, 211, 238, 0.12); color: var(--cyan); padding: 2px 6px; border-radius: 4px; font-size: 0.82rem; }
+.dynamic-card-body ul, .dynamic-card-body ol { margin: 8px 0; padding-left: 20px; }
+.dynamic-card-body li { margin-bottom: 4px; }
+
+/* Music Player Controls */
+.music-box { margin-top: 12px; }
+.track-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.2);
+  margin: 14px 0 8px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.track-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--green), var(--cyan));
+  box-shadow: 0 0 10px var(--cyan);
+  transition: width 0.3s linear;
+}
+.track-ctrls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+.track-ctrls button {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+}
+.hud-banner {
+  margin-top: 28px;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  background: linear-gradient(90deg, rgba(14, 165, 233, 0.18), rgba(139, 92, 246, 0.18));
+  border: 1px solid rgba(34, 211, 238, 0.4);
+  border-radius: 24px;
+  box-shadow: 0 0 32px rgba(34, 211, 238, 0.14);
+}
+.hud-banner h2 { margin: 0 0 6px; color: #fff; font-size: 1.3rem; }
+.hud-banner p { margin: 0; font-size: 0.88rem; }
+.hud-banner button {
+  background: linear-gradient(90deg, var(--cyan), #38bdf8);
+  color: #020617;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 12px 24px;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   BALL KNOWLEDGE TACTICAL SUITE STYLING
+   ========================================================================== */
+.iptv-ch-btn {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  color: var(--muted);
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.iptv-ch-btn:hover {
+  background: rgba(34, 211, 238, 0.15);
+  color: #fff;
+  border-color: var(--cyan);
+}
+.iptv-ch-btn.active {
+  background: rgba(34, 211, 238, 0.25);
+  color: var(--cyan);
+  border-color: var(--cyan);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
+  font-weight: 700;
+}
+
+/* 3D Perspective & Spatial Depth on Hover (Inspired by Scroll-World & Apple Design) */
+.card {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.card:hover {
+  transform: translateY(-4px) scale(1.01);
+  border-color: rgba(34, 211, 238, 0.45);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(34, 211, 238, 0.18);
+}
+

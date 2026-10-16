@@ -4,19 +4,33 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#020617" />
-  <title>Jarvis / Hermes Dashboard UI</title>
-  <link rel="stylesheet" href="./style.css?v=1" />
+  <title>J.A.R.V.I.S. Command Surface — Arc Reactor & Live Intelligence</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' stroke='%2322d3ee' stroke-width='4' fill='%23020617'/><circle cx='50' cy='50' r='30' stroke='%2322d3ee' stroke-width='2' fill='none' stroke-dasharray='6,4'/><circle cx='50' cy='50' r='14' fill='%2322d3ee'/></svg>" />
+  <link rel="stylesheet" href="/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
   <main class="shell">
+    <!-- ===================== HERO: ARC REACTOR & GENERATIVE SYNTHESIS ===================== -->
     <section class="hero panel glow">
       <div class="topline">
-        <span class="status-dot"></span>
-        <span>J.A.R.V.I.S LITE COMMAND SURFACE</span>
-        <span class="clock" id="clock">--:--:--</span>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="status-dot" id="neuralDot"></span>
+          <span>J.A.R.V.I.S COMMAND SURFACE // NEURAL LINK ACTIVE</span>
+          <span id="systemHealthBadge" style="display:inline-flex; align-items:center; gap:5px; background:rgba(60,255,140,0.12); border:1px solid #3cff8c; color:#3cff8c; font-size:9px; font-weight:700; letter-spacing:0.08em; padding:2px 7px; border-radius:4px; font-family:monospace; cursor:pointer;" title="Click for Industrial SRE Diagnostics">
+            <span id="systemHealthDot" style="width:6px; height:6px; border-radius:50%; background:#3cff8c; box-shadow:0 0 6px #3cff8c;"></span>
+            <span id="systemHealthText">NOMINAL</span>
+          </span>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button id="cmdPaletteTriggerBtn" style="font-family:monospace; font-size:9.5px; background:rgba(6,9,12,0.8); border:1px solid rgba(34,211,238,0.3); color:var(--cyan); padding:3px 8px; border-radius:4px; cursor:pointer;" title="Command Palette (Ctrl + K)">[⌘ Ctrl+K]</button>
+          <button id="emergencyHaltBtn" style="background:rgba(255,93,108,0.15); border:1px solid rgba(255,93,108,0.5); color:#ff5d6c; font-size:9.5px; font-family:monospace; padding:3px 8px; border-radius:4px; cursor:pointer; font-weight:bold; letter-spacing:0.06em;" title="Instant Emergency Halt">[HALT ⏹]</button>
+          <a href="/" style="color:var(--cyan); text-decoration:none; border:1px solid rgba(34,211,238,0.4); padding:3px 9px; border-radius:4px; font-size:10px; font-weight:bold; letter-spacing:1px; background:rgba(34,211,238,0.12);">[TACTICAL 3D HUD ↗]</a>
+          <span class="clock" id="clock">--:--:--</span>
+        </div>
       </div>
 
-      <div class="core-wrap" id="mic-btn" aria-label="Decorative Jarvis reactor visual" style="cursor: pointer;">
+      <div class="core-wrap" id="mic-btn" aria-label="Interactive Jarvis Arc Reactor" style="cursor: pointer;" title="Click Reactor to Listen">
         <div class="orbit orbit-one"></div>
         <div class="orbit orbit-two"></div>
         <div class="orbit orbit-three"></div>
@@ -26,78 +40,304 @@
       </div>
 
       <div class="hero-copy">
-        <p class="eyebrow" id="status">System Standby (Click Reactor to Listen)</p>
-        <h1>Jarvis Lite Dashboard</h1>
+        <p class="eyebrow" id="status">System Online (Click Reactor or Speak to Query JARVIS)</p>
+        <h1>J.A.R.V.I.S.</h1>
         <p>
-          A safe public UI prototype for automation, smart-home status,
-          document workflows, media tools, and local knowledge systems.
+          Single Source of Truth AI Operating Assistant. Live hardware telemetry, IoT controls, real media streams, and autonomous UI synthesis.
         </p>
+
+        <!-- Generative UI Synthesis Input -->
+        <div class="gen-bar">
+          <input type="text" class="gen-input" id="genUiPrompt" placeholder="Request a new frontend element (e.g. 'Workout tracker', 'Explain quantum computing', 'BMI calculator')..." />
+          <button class="gen-btn" id="genUiSubmit">[⚡ SYNTHESIZE ELEMENT]</button>
+        </div>
       </div>
     </section>
 
+    <!-- ===================== DYNAMIC GENERATED UI GRID ===================== -->
+    <section class="dynamic-section" id="dynamicSection">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow" style="color:var(--cyan);">GENERATIVE UI ENGINE</p>
+          <h2 style="margin:0; font-size:1.4rem;">Dynamic Frontend Elements</h2>
+          <p style="margin:4px 0 0; font-size:0.85rem; color:var(--muted);">Components created live on demand upon user queries for which no static UI previously existed.</p>
+        </div>
+        <button id="clearDynamicElements" style="font-size:0.75rem; padding:6px 14px;">[Clear Generated Elements]</button>
+      </div>
+      <div class="dynamic-grid" id="dynamicGrid">
+        <!-- New elements mount here automatically -->
+        <div class="dynamic-card" id="defaultGenCard">
+          <div class="dynamic-card-head">
+            <span class="dynamic-card-title">INFO // GENERATIVE ENGINE READY</span>
+          </div>
+          <div class="dynamic-card-body">
+            <p><b>Autonomous UI Synthesis is armed and listening.</b></p>
+            <p>When you ask JARVIS open-ended questions, recipes, documentation, or custom tools, interactive cyber-styled cards will render directly into this grid.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== MAIN MODULES GRID ===================== -->
     <section class="grid">
-      <article class="panel card">
-        <p class="label">Weather Station</p>
-        <h2>24°C / Clear</h2>
-        <p>Local meteorological data synced. No severe weather alerts in your area.</p>
-        <div class="meter"><span style="width: 88%"></span></div>
+      <!-- 1. Live Weather Station -->
+      <article class="panel card" id="cardWeather">
+        <p class="label">Weather Station (Karachi)</p>
+        <h2 id="weatherTemp">26°C / Clear</h2>
+        <p id="weatherDesc">Humidity: 62% · Wind: 14 km/h · Karachi</p>
+        <div class="meter"><span id="weatherMeter" style="width: 65%"></span></div>
       </article>
 
-      <article class="panel card">
-        <p class="label">Smart-Home Status</p>
-        <h2>TP-Link Kasa: Online</h2>
-        <p>Local network UDP connection established. Lights and appliances ready.</p>
-        <div class="meter amber"><span style="width: 100%"></span></div>
+      <!-- 2. Real Hardware Diagnostics -->
+      <article class="panel card" id="cardDiagnostics">
+        <p class="label">Hardware Diagnostics (psutil)</p>
+        <h2 id="diagSummary">CPU: 24% · RAM: 58%</h2>
+        <p id="diagDetails">GPU: 0% · Temp: 45°C · Net: 0.8 Mb/s</p>
+        <div class="meter amber"><span id="diagMeter" style="width: 45%"></span></div>
       </article>
 
-      <article class="panel card">
-        <p class="label">GitHub Bridge</p>
-        <h2>Repository Synced</h2>
-        <p>JARVIS-AI-PROJECT is up to date on origin/main. No pending commits.</p>
-        <div class="meter violet"><span style="width: 100%"></span></div>
+      <!-- 3. Real Music & Audio Subsystem -->
+      <article class="panel card" id="cardMusic">
+        <p class="label">Audio Subsystem (Windows Media / Spotify)</p>
+        <h2 id="musicTitle" style="font-size:1.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Audio Stream Ready</h2>
+        <p id="musicArtist" style="font-size:0.85rem; margin:0;">Windows Media Session Linked</p>
+        <div class="music-box">
+          <div class="track-bar"><div class="track-bar-fill" id="musicFill"></div></div>
+          <div class="track-ctrls">
+            <button id="mPrev">⏮</button>
+            <button id="mPlay" style="background:rgba(34,211,238,0.2); font-weight:bold;">▶/⏸</button>
+            <button id="mNext">⏭</button>
+            <input type="text" id="mSearch" placeholder="Search track..." style="flex:1; background:rgba(0,0,0,0.5); border:1px solid rgba(34,211,238,0.3); color:#fff; padding:4px 8px; border-radius:999px; font-size:11px; outline:none;" />
+            <button id="mSearchBtn" style="padding:4px 10px; font-size:11px;">[PLAY]</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- 4. Smart-Home Matrix -->
+      <article class="panel card" id="cardHome">
+        <p class="label">Smart-Home Matrix (TP-Link Kasa)</p>
+        <h2 id="plugStatus">Main Desk Appliance: STANDBY</h2>
+        <p>Local network UDP broadcast bridge linked.</p>
+        <div style="margin-top:14px; display:flex; gap:10px; align-items:center;">
+          <button id="togglePlugBtn" style="background:rgba(34,211,238,0.15); border-color:var(--cyan); font-weight:bold;">Toggle Desk Plug</button>
+          <span id="plugIndicator" style="font-size:0.8rem; color:var(--muted);">Status: Ready</span>
+        </div>
+      </article>
+
+      <!-- 5. Crypto & Wall St Markets -->
+      <article class="panel card" id="cardMarkets">
+        <p class="label">Crypto Spot & Markets (Binance)</p>
+        <h2 id="cryptoBtc">BTC: $83,250 (+0.25%)</h2>
+        <p id="marketIndices">Order depth: Bid/Ask synced · Wall St nominal</p>
+        <div class="meter violet"><span style="width: 78%"></span></div>
+      </article>
+
+      <!-- 6. Formula 1 Pit Wall -->
+      <article class="panel card" id="cardF1">
+        <p class="label">F1 Pit Wall Telemetry</p>
+        <h2 id="f1Race">FIA Grand Prix</h2>
+        <p id="f1Countdown">Telemetry link nominal · Pit strategy active</p>
+        <div class="meter"><span style="width: 90%"></span></div>
       </article>
     </section>
 
+    <!-- ===================== BALL KNOWLEDGE: TACTICAL RECON & SENSOR SUITE ===================== -->
+    <section class="section-head" style="margin-top: 36px;">
+      <div>
+        <p class="eyebrow" style="color:var(--cyan);">EXTENDED INTEL &amp; OPTICAL RECON</p>
+        <h2 style="margin:0; font-size:1.4rem;">Tactical Sensor &amp; OSINT Suite</h2>
+        <p style="margin:4px 0 0; font-size:0.85rem; color:var(--muted);">Live HLS broadcasts (iptv-org), Roboflow Supervision computer vision, Geo-Sleuth coordinates, Scout OSINT, and PhoneLink controller.</p>
+      </div>
+    </section>
+
+    <section class="grid" style="margin-top:16px;">
+      <!-- A. IPTV Live Tactical Video Monitor (iptv-org) -->
+      <article class="panel card" id="cardIptv" style="grid-column: span 2;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <p class="label" style="margin:0;">Tactical Live Stream (IPTV-Org)</p>
+          <span class="badge" id="iptvBadge">ORBITAL // 408 KM</span>
+        </div>
+        <h2 id="iptvTitle" style="font-size:1.2rem; margin:0 0 10px;">NASA TV — Orbital Stream</h2>
+        <div class="iptv-video-wrap" style="position:relative; width:100%; height:260px; background:#000; border-radius:12px; overflow:hidden; border:1px solid rgba(34,211,238,0.25);">
+          <video id="iptvPlayer" controls autoplay muted playsinline style="width:100%; height:100%; object-fit:contain;"></video>
+          <div id="iptvOverlay" style="position:absolute; top:8px; left:12px; background:rgba(2,6,23,0.75); padding:3px 8px; border-radius:4px; font-size:10px; color:#22d3ee; pointer-events:none;">● LIVE BROADCAST</div>
+        </div>
+        <div class="iptv-channels" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;">
+          <button class="iptv-ch-btn active" data-ch="nasa">🚀 NASA TV</button>
+          <button class="iptv-ch-btn" data-ch="skynews">📰 Sky News</button>
+          <button class="iptv-ch-btn" data-ch="aljazeera">🌍 Al Jazeera</button>
+          <button class="iptv-ch-btn" data-ch="euronews">🇪🇺 Euronews</button>
+          <button class="iptv-ch-btn" data-ch="weathernation">⛈ WeatherNation</button>
+          <button class="iptv-ch-btn" data-ch="redbull">🏎 Red Bull TV</button>
+          <button class="iptv-ch-btn" data-ch="dw">🇩🇪 DW News</button>
+        </div>
+      </article>
+
+      <!-- B. Roboflow Supervision Optical Recon -->
+      <article class="panel card" id="cardVision">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <p class="label" style="margin:0;">Optical Recon (Supervision)</p>
+          <span class="badge" id="visionStatus">ONLINE</span>
+        </div>
+        <h2 id="visionDetections" style="font-size:1.15rem; margin:6px 0;">0 Targets Detected</h2>
+        <div style="position:relative; width:100%; height:190px; background:#000; border-radius:10px; overflow:hidden; border:1px solid rgba(34,211,238,0.2); display:flex; align-items:center; justify-content:center;">
+          <img id="visionImg" src="" alt="Optical Feed" style="width:100%; height:100%; object-fit:cover; display:none;" />
+          <div id="visionPlaceholder" style="text-align:center; color:var(--cyan); font-size:11px; font-family:monospace;">
+            <div>◈ OPTICAL SENSOR READY</div>
+            <div style="font-size:9.5px; color:var(--muted); margin-top:4px;">Roboflow Supervision 0.30.9 + OpenCV</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:12px; align-items:center;">
+          <button id="visionScanBtn" style="flex:1; padding:6px 12px; font-size:11px; font-weight:bold;">[SCAN OPTICAL SECTOR]</button>
+          <span id="visionRes" style="font-size:10px; color:var(--muted);">640x480</span>
+        </div>
+      </article>
+
+      <!-- C. Geo-Sleuth OSINT Geolocation -->
+      <article class="panel card" id="cardGeoSleuth">
+        <p class="label">OSINT Geolocation (Geo-Sleuth)</p>
+        <h2 id="geoTargetTitle" style="font-size:1.1rem; margin:4px 0 10px;">Target: Standby</h2>
+        <div style="display:flex; gap:6px;">
+          <input type="text" id="geoQueryInput" placeholder="Enter landmark, city, or IP (e.g. 8.8.8.8)..." style="flex:1; background:rgba(0,0,0,0.6); border:1px solid rgba(34,211,238,0.3); color:#fff; padding:6px 10px; border-radius:8px; font-size:11px; outline:none;" />
+          <button id="geoSearchBtn" style="padding:6px 12px; font-size:11px; font-weight:bold;">[LOCATE]</button>
+        </div>
+        <div id="geoDetailsBox" style="margin-top:10px; padding:10px; background:rgba(0,0,0,0.4); border-radius:8px; font-size:11px; min-height:85px; border:1px solid rgba(34,211,238,0.15);">
+          <div style="color:var(--muted);">GPS Coordinates: <span id="geoCoords" style="color:#fff;">--</span></div>
+          <div style="color:var(--muted); margin-top:3px;">Display: <span id="geoName" style="color:#bae6fd;">Awaiting target query</span></div>
+          <div style="margin-top:6px;"><a id="geoOsmLink" href="#" target="_blank" style="color:var(--cyan); text-decoration:none; font-size:10.5px; display:none;">[View on OpenStreetMap ↗]</a></div>
+        </div>
+      </article>
+
+      <!-- D. Scout Web Intelligence & Lead Engine -->
+      <article class="panel card" id="cardScout">
+        <p class="label">Web Intelligence &amp; Leads (Scout)</p>
+        <h2 id="scoutTargetTitle" style="font-size:1.1rem; margin:4px 0 10px;">Domain OSINT Recon</h2>
+        <div style="display:flex; gap:6px;">
+          <input type="text" id="scoutQueryInput" placeholder="Domain (e.g. python.org, github.com)..." style="flex:1; background:rgba(0,0,0,0.6); border:1px solid rgba(34,211,238,0.3); color:#fff; padding:6px 10px; border-radius:8px; font-size:11px; outline:none;" />
+          <button id="scoutSearchBtn" style="padding:6px 12px; font-size:11px; font-weight:bold;">[SCOUT]</button>
+        </div>
+        <div id="scoutDetailsBox" style="margin-top:10px; padding:10px; background:rgba(0,0,0,0.4); border-radius:8px; font-size:11px; min-height:85px; border:1px solid rgba(34,211,238,0.15);">
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--muted);">Lead Score: <b id="scoutScore" style="color:var(--green);">--</b></span>
+            <span style="color:var(--muted);">Emails: <b id="scoutEmailsCount" style="color:#fff;">0</b></span>
+          </div>
+          <div id="scoutTechTags" style="display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;">
+            <span class="badge" style="font-size:9px;">TECH SCANNER READY</span>
+          </div>
+          <p id="scoutSummary" style="margin:6px 0 0; font-size:10.5px; color:var(--muted);">Enter domain to extract contacts &amp; tech stack.</p>
+        </div>
+      </article>
+
+      <!-- E. PhoneLink Device Controller -->
+      <article class="panel card" id="cardPhoneLink">
+        <p class="label">Mobile Controller (PhoneLink)</p>
+        <h2 id="phoneName" style="font-size:1.1rem; margin:4px 0 6px;">Galaxy S24 Ultra</h2>
+        <p id="phoneStatusDesc" style="margin:0 0 10px; font-size:0.82rem; color:var(--green);">● PAIRED // ONLINE (Zong 5G)</p>
+        <div class="meter" style="margin-bottom:12px;"><span id="phoneBatteryMeter" style="width: 87%; background:var(--green);"></span></div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button id="phonePingBtn" style="flex:1; padding:6px 8px; font-size:10.5px;">[🔔 PING DEVICE]</button>
+          <button id="phoneClipBtn" style="flex:1; padding:6px 8px; font-size:10.5px;">[📋 BEAM CLIPBOARD]</button>
+          <button id="phoneQrBtn" style="padding:6px 10px; font-size:10.5px; background:rgba(34,211,238,0.2);">[QR LINK]</button>
+        </div>
+        <div id="phoneActionResult" style="margin-top:8px; font-size:10px; color:var(--cyan); height:14px; overflow:hidden;"></div>
+      </article>
+
+      <!-- F. Unlimited-OCR Document Extraction -->
+      <article class="panel card" id="cardOcr">
+        <p class="label">Document Text Engine (Unlimited-OCR)</p>
+        <h2 style="font-size:1.1rem; margin:4px 0 10px;">Extract Text &amp; Code</h2>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <input type="file" id="ocrFileInput" accept="image/*" style="display:none;" />
+          <button id="ocrUploadBtn" style="flex:1; padding:6px 12px; font-size:11px;">[UPLOAD IMAGE / SCAN]</button>
+          <button id="ocrDemoBtn" style="padding:6px 12px; font-size:11px; background:rgba(34,211,238,0.2);">[DEMO SCAN]</button>
+        </div>
+        <pre id="ocrResultBox" style="margin-top:10px; padding:8px; background:rgba(0,0,0,0.5); border-radius:8px; font-size:10px; max-height:85px; overflow-y:auto; color:#bae6fd; white-space:pre-wrap; border:1px solid rgba(34,211,238,0.15);">Awaiting document or image input...</pre>
+      </article>
+    </section>
+
+    <!-- ===================== TERMINAL, CODER SANDBOX & MODULES ===================== -->
     <section class="split">
+      <!-- Interactive Terminal & Neural Chat -->
       <article class="panel command-panel">
         <div class="section-head">
           <div>
-            <p class="label">Command Preview</p>
-            <h2>Try a safe demo command</h2>
+            <p class="label">System Terminal & Neural Chat</p>
+            <h2>Live Dialogue with J.A.R.V.I.S.</h2>
           </div>
-          <button id="randomCommand">Random</button>
         </div>
         <div class="terminal" id="terminalOutput">
-          <p><span>$</span> hermes status</p>
-          <p>Gateway: ready</p>
-          <p>Daily automations: scheduled</p>
-          <p>Dashboard: public-safe demo mode</p>
+          <p><span>$</span> jarvis cns status</p>
+          <p>Neural EventBus: Online (ws://127.0.0.1:8000/api/ws/hud)</p>
+          <p>Telemetry: Real-time hardware loop streaming</p>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:14px;">
+          <input type="text" id="chatInputText" placeholder="Type command or query for J.A.R.V.I.S..." style="flex:1; background:rgba(0,0,0,0.5); border:1px solid rgba(34,211,238,0.3); color:#fff; padding:10px 16px; border-radius:999px; outline:none; font-family:inherit;" />
+          <button id="chatSendBtn" style="font-weight:bold;">[SEND ⇧]</button>
         </div>
       </article>
 
+      <!-- Python Coder Sandbox -->
       <article class="panel modules">
-        <p class="label">Modules</p>
-        <div id="moduleList"></div>
+        <p class="label">Isolated Python Coder Sandbox</p>
+        <h2 style="margin:0 0 10px; font-size:1.2rem;">Execute Local Code</h2>
+        <textarea id="coderText" style="width:100%; height:95px; background:rgba(0,0,0,0.6); border:1px solid rgba(34,211,238,0.25); border-radius:12px; color:#3fe08a; font-family:monospace; font-size:11px; padding:10px; outline:none; resize:none;">import sys&#10;print(f"J.A.R.V.I.S. Python Runtime: {sys.version.split()[0]}")</textarea>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+          <button id="runCoderBtn" style="font-size:0.8rem; padding:6px 16px; background:rgba(34,211,238,0.2);">[▶ RUN CODE]</button>
+          <span id="coderStatus" style="font-size:0.75rem; color:var(--muted);">Sandbox Ready</span>
+        </div>
+        <pre id="coderOutput" style="margin-top:8px; padding:8px; background:rgba(0,0,0,0.4); border-radius:8px; color:#bae6fd; font-size:10.5px; max-height:60px; overflow-y:auto; white-space:pre-wrap;"></pre>
       </article>
     </section>
 
-    <section class="panel roadmap">
-      <p class="label">Next Build Ideas</p>
-      <div class="roadmap-row">
-        <span>01</span>
-        <p>Phone-friendly PWA with secure command bridge.</p>
+    <!-- ===================== GOD'S EYE VIEW LAUNCHER ===================== -->
+    <section class="hud-banner" style="background: linear-gradient(135deg, rgba(6,182,212,0.15) 0%, rgba(15,23,42,0.8) 100%); border-color: rgba(34,211,238,0.4); margin-bottom: 20px;">
+      <div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+          <span class="status-dot" style="background:#3fe08a; box-shadow:0 0 10px #3fe08a;"></span>
+          <span style="font-size:10px; color:var(--cyan); font-weight:bold; letter-spacing:1.5px;">GOD'S EYE VIEW // SPY SATELLITE ENGINE ONLINE (127.0.0.1:5173)</span>
+        </div>
+        <h2 style="margin:0 0 6px;">◈ God's Eye View — Global 3D Spatial Intelligence Console</h2>
+        <p style="margin:0; color:var(--muted); font-size:0.85rem;">Photorealistic 3D CesiumJS Earth with live ADS-B aircraft, AIS maritime vessels, orbital satellite constellation, USGS seismic activity, and CCTV surveillance feeds.</p>
       </div>
-      <div class="roadmap-row">
-        <span>02</span>
-        <p style="text-decoration: line-through; opacity: 0.5;">Dashboard cards for weather, GitHub, documents, and smart-home status. (COMPLETED)</p>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button onclick="window.open('/godseye', '_blank')" style="background:rgba(34,211,238,0.2); font-weight:bold;">[EMBEDDED VIEWER ↗]</button>
+        <button onclick="window.open('http://127.0.0.1:5173/', '_blank')" style="background:var(--cyan); color:#020617; font-weight:bold;">[LAUNCH 3D GLOBE ↗]</button>
       </div>
-      <div class="roadmap-row">
-        <span>03</span>
-        <p>Approval-flow screen for risky actions.</p>
+    </section>
+
+    <!-- ===================== TACTICAL HUD & VR MAP LAUNCHER ===================== -->
+    <section class="hud-banner">
+      <div>
+        <h2>◈ 3D Tactical Holographic HUD &amp; Orbital Radar</h2>
+        <p>Access the full Three.js holographic particle globe, live ISS orbital tracker, and Esri dark satellite map.</p>
       </div>
+      <button onclick="window.open('http://127.0.0.1:8000/hud', '_blank')">[OPEN TACTICAL HUD ↗]</button>
     </section>
   </main>
 
-  <script src="./app.js?v=1"></script>
+  <!-- ==================== COMMAND PALETTE MODAL ==================== -->
+  <div id="cmdPaletteModal" style="display:none; position:fixed; inset:0; background:rgba(2,6,12,0.85); backdrop-filter:blur(8px); z-index:100000; align-items:center; justify-content:center;" onclick="if(event.target===this)closeCommandPalette()">
+    <div style="width:min(90vw, 580px); background:#090d14; border:1px solid #4dd8ff; border-radius:8px; box-shadow:0 0 35px rgba(77,216,255,0.25); overflow:hidden; font-family:monospace;">
+      <div style="display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid rgba(77,216,255,0.2); background:rgba(77,216,255,0.06);">
+        <span style="color:#4dd8ff; margin-right:8px; font-weight:bold; font-size:14px;">⌘</span>
+        <input type="text" id="cmdPaletteInput" placeholder="Type command or jump to module... (↑↓ to select, Enter to run, Esc to close)" style="flex:1; background:transparent; border:none; outline:none; color:#eef4f8; font-family:monospace; font-size:12px;" />
+        <span style="color:var(--muted); font-size:9px; border:1px solid rgba(120,170,200,0.3); padding:2px 6px; border-radius:3px; cursor:pointer;" onclick="closeCommandPalette()">ESC</span>
+      </div>
+      <div id="cmdPaletteList" style="max-height:360px; overflow-y:auto; padding:6px 0;"></div>
+    </div>
+  </div>
+
+  <!-- ==================== SRE DIAGNOSTICS MODAL ==================== -->
+  <div id="diagModal" style="display:none; position:fixed; inset:0; background:rgba(2,6,12,0.85); backdrop-filter:blur(8px); z-index:100000; align-items:center; justify-content:center;" onclick="if(event.target===this)closeHealthModal()">
+    <div style="width:min(90vw, 560px); background:#090d14; border:1px solid #3cff8c; border-radius:8px; box-shadow:0 0 35px rgba(60,255,140,0.2); overflow:hidden; font-family:monospace; padding:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid rgba(60,255,140,0.25); padding-bottom:8px;">
+        <div style="color:#3cff8c; font-weight:bold; font-size:13px; letter-spacing:0.08em;">◈ J.A.R.V.I.S. SRE HEALTH &amp; PROBE MATRIX</div>
+        <button onclick="closeHealthModal()" style="background:transparent; border:none; color:var(--muted); cursor:pointer; font-size:14px;">✕</button>
+      </div>
+      <div id="diagModalBody"></div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
 </body>
 </html>

@@ -1,0 +1,14 @@
+/* In embed mode, retain the tactical command dock and HUD controls */
+body.ui-embed #key-setup-chip,
+body.ui-embed #key-setup,
+body.ui-embed #first-run-launcher {
+  display: none !important;
+}
+
+body.ui-embed #scope-mask {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+

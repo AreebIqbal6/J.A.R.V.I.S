@@ -143,12 +143,60 @@ class InitialScreen(QWidget):
         self.animation.setEasingCurve(QEasingCurve.InOutQuad)
         self.animation.setLoopCount(-1)
 
-        # 3. Status Monitor
+        # 3. Interactive Mic Push-to-Talk Button
+        from PyQt5.QtGui import QIcon
+        self.mic_btn = QPushButton()
+        self.mic_btn.setFixedSize(70, 70)
+        self.mic_btn.setCursor(Qt.PointingHandCursor)
+        mic_icon_path = GraphicsDirectoryPath("Mic_on.png")
+        if os.path.exists(mic_icon_path):
+            self.mic_btn.setIcon(QIcon(mic_icon_path))
+            self.mic_btn.setIconSize(QSize(42, 42))
+        else:
+            self.mic_btn.setText("MIC")
+
+        self.mic_btn.setStyleSheet("""
+        QPushButton {
+            background-color: #121820;
+            border: 2px solid #00aaff;
+            border-radius: 35px;
+        }
+        QPushButton:hover {
+            background-color: #003366;
+            border-color: #00d4ff;
+        }
+        QPushButton:pressed {
+            background-color: #00ff88;
+            border-color: #00ff88;
+        }
+        """)
+        self.mic_btn.clicked.connect(self.toggle_mic)
+
+        mic_box = QHBoxLayout()
+        mic_box.addStretch()
+        mic_box.addWidget(self.mic_btn)
+        mic_box.addStretch()
+        layout.addSpacing(15)
+        layout.addLayout(mic_box)
+
+        self.mic_hint = QLabel("Click to Speak or Say 'Jarvis'")
+        self.mic_hint.setAlignment(Qt.AlignCenter)
+        self.mic_hint.setFont(QFont("Segoe UI", 11))
+        self.mic_hint.setStyleSheet("color: #555; letter-spacing: 1px; margin-top: 8px;")
+        layout.addWidget(self.mic_hint)
+
+        # 4. Status Monitor
         self.status_timer = QTimer(self)
         self.status_timer.timeout.connect(self.poll_backend_status)
         self.status_timer.start(300) # Ping backend every 300ms
 
         self.current_status_state = ""
+
+    def toggle_mic(self):
+        SetMicrophoneStatus("True")
+        self.status_label.setText("Listening...")
+        self.status_label.setStyleSheet("color: #00ff00; font-size: 20px; font-weight: 600; letter-spacing:1px;")
+        self.animation.start()
 
     def poll_backend_status(self):
         backend_status = GetAssistantStatus()
@@ -191,15 +239,36 @@ class CustomTopBar(QWidget):
         # Title
         title = QLabel("J.A.R.V.I.S")
         title.setFont(QFont("Segoe UI", 16, QFont.Normal))
-        title.setStyleSheet("color: #888; letter-spacing:3px;")
+        title.setStyleSheet("color: #00d4ff; letter-spacing:3px; font-weight: bold;")
         layout.addWidget(title)
         layout.addStretch()
 
         # Buttons
+        btn_hud = QPushButton("Tactical HUD")
         btn_home = QPushButton("Home")
         btn_chat = QPushButton("Chat")
         btn_min = QPushButton("—")
         btn_close = QPushButton("✕")
+
+        hud_btn_style = """
+        QPushButton {
+            background-color: #0b1a26;
+            border: 1px solid #00d4ff;
+            border-radius: 12px;
+            padding: 6px 16px;
+            color: #00d4ff;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #00d4ff;
+            color: black;
+        }
+        """
+        btn_hud.setStyleSheet(hud_btn_style)
+        def launch_browser_hud():
+            import webbrowser
+            webbrowser.open("http://127.0.0.1:8000")
+        btn_hud.clicked.connect(launch_browser_hud)
 
         flat_btn_style = """
         QPushButton {
@@ -237,6 +306,7 @@ class CustomTopBar(QWidget):
         btn_min.clicked.connect(self.window().showMinimized)
         btn_close.clicked.connect(self.window().close)
 
+        layout.addWidget(btn_hud)
         layout.addWidget(btn_home)
         layout.addWidget(btn_chat)
         layout.addWidget(btn_min)
@@ -261,6 +331,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setStyleSheet(MAIN_STYLE)
+        self.setWindowTitle("J.A.R.V.I.S. Artificial Intelligence")
 
         stack = QStackedWidget()
         stack.addWidget(InitialScreen())
@@ -274,25 +345,20 @@ class MainWindow(QMainWindow):
         root = QWidget()
         root.setLayout(layout)
         self.setCentralWidget(root)
-        self.showMaximized()
+        self.resize(1100, 750)
+        qr = self.frameGeometry()
+        cp = QApplication.desktop().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+        self.show()
 
 def GraphicalUserInterface():
-    from Frontend.WebGLMasterHUD import launch_webgl_hud
-    
-    # Fix black screen / WebGL crashes on Windows
-    sys.argv.append("--ignore-gpu-blocklist")
-    sys.argv.append("--enable-gpu-rasterization")
-    sys.argv.append("--enable-webgl")
-    sys.argv.append("--no-sandbox")
-    sys.argv.append("--disable-web-security")
-    sys.argv.append("--allow-file-access-from-files")
-    
-    QApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
     app = QApplication.instance()
     if not app:
         app = QApplication(sys.argv)
-    window = launch_webgl_hud()
-    print('>> App created, starting exec loop...')
+    window = MainWindow()
+    window.show()
+    print('>> [GUI]: J.A.R.V.I.S. Desktop Interface running.')
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

@@ -1,0 +1,50 @@
+# Environment & Secrets
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+
+# Python & Caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Temporary Audio & Logs
+temp*.wav
+temp*.mp3
+*.log
+logs/
+Data/speech.mp3
+ChatLog.json
+Data/ChatLog.json
+*.jsonl
+rewrite_*.py
+
+# Databases & Local Dynamic Data
+*.db-journal
+*.db-wal
+*.db-shm
+decrypted.txt
+error_*.log
+test_*.png
+
+# Node & Build artifacts
+node_modules/
+dist/
+.vite-build/
+qa-shots/
+
+# OS specific
+.DS_Store
+Thumbs.db

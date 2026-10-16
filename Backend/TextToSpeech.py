@@ -21,13 +21,32 @@ os.makedirs(os.path.dirname(AUDIO_PATH), exist_ok=True)
 def contains_urdu(text):
     return bool(re.search(r'[\u0600-\u06FF]', text))
 
+IS_SPEAKING = False
+
+def is_speaking() -> bool:
+    global IS_SPEAKING
+    try:
+        if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
+            return True
+    except Exception:
+        pass
+    return IS_SPEAKING
+
 # --- BARGE-IN INTERRUPTION ---
 def StopTTS():
     """Instantly kills the currently playing TTS audio buffer."""
+    global IS_SPEAKING
+    IS_SPEAKING = False
     try:
-        if pygame.mixer.music.get_busy():
+        from Backend.EventBus import EventBus
+        EventBus.emit_state("idle", "Playback interrupted by barge-in")
+    except Exception:
+        pass
+    try:
+        if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
             print(">> [BARGE-IN]: Interruption detected. Silencing audio buffer.")
             pygame.mixer.music.stop()
+            pygame.mixer.music.unload()
     except:
         pass
 
@@ -69,6 +88,13 @@ async def TextToAudioFile(text) -> bool:
         return False
 
 def TTS(Text, func=lambda: None):
+    global IS_SPEAKING
+    IS_SPEAKING = True
+    try:
+        from Backend.EventBus import EventBus
+        EventBus.emit_state("speaking")
+    except Exception:
+        pass
     try:
         try:
             pygame.mixer.music.stop()
@@ -86,13 +112,13 @@ def TTS(Text, func=lambda: None):
         pygame.mixer.music.play() 
 
         # --- FIX 3: THE RACE CONDITION PATCH ---
-        sleep(0.2) 
+        sleep(0.1) 
 
         while pygame.mixer.music.get_busy():
             if func() == False: 
                 pygame.mixer.music.stop()
                 break
-            sleep(0.1) 
+            sleep(0.05) 
 
         return True 
 
@@ -100,6 +126,12 @@ def TTS(Text, func=lambda: None):
         print(f"!! Error in TTS: {e}")
         SpeakOffline(Text)
     finally:
+        IS_SPEAKING = False
+        try:
+            from Backend.EventBus import EventBus
+            EventBus.emit_state("idle")
+        except Exception:
+            pass
         try:
             pygame.mixer.music.stop()
             pygame.mixer.music.unload() 
