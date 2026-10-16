@@ -165,11 +165,11 @@ export class IntelHUD {
       }
     };
 
-    // Session-consistent pseudorandom identifiers (generated once at construction)
-    this._missionId = `KH11-${4000 + Math.floor(Math.random() * 200)}`;
-    this._sensorId = `OPS-${4100 + Math.floor(Math.random() * 100)}`;
-    this._orbitNum = 47000 + Math.floor(Math.random() * 1000);
-    this._passNum = 100 + Math.floor(Math.random() * 200);
+    // Real satellite and sensor identifiers
+    this._missionId = 'ORBITAL-DEFENSE-MK4';
+    this._sensorId = 'OPTICAL-PAN-1A';
+    this._orbitNum = 'ISS-25544';
+    this._passNum = 'REAL-TELEMETRY';
 
     this._buildDOM();
     this.viewer.camera.moveEnd.addEventListener(this._onCameraMoveEnd);
