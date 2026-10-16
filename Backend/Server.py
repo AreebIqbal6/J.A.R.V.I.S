@@ -26,9 +26,9 @@ from Backend.UnlimitedOCR import extract_document_text
 from Backend.PhoneLink import get_phone_status, execute_phone_action, SendToPhone
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-UI_PATH = os.path.join(ROOT_DIR, "jarvis_ui.html")
+UI_PATH = os.path.join(ROOT_DIR, "Frontend", "Web", "hud_index.html")
 if not os.path.exists(UI_PATH):
-    UI_PATH = os.path.join(ROOT_DIR, "Frontend", "Web", "hud_index.html")
+    UI_PATH = os.path.join(ROOT_DIR, "Frontend", "index.html")
 
 app = FastAPI(title="J.A.R.V.I.S. Central Nervous System (Reliability Engine v1)")
 

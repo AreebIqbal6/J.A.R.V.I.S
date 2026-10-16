@@ -1,11 +1,13 @@
-# Environment & Secrets
+# Environment & Credentials
 .env
 .env.*
 *.pem
 *.key
 credentials.json
+Data/adbkey*
+adbkey*
 
-# Python & Caches
+# Python & Build Caches
 __pycache__/
 *.py[cod]
 *$py.class
@@ -13,6 +15,8 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
+build/
+dist/
 
 # Virtual Environments
 .venv/
@@ -20,31 +24,42 @@ venv/
 env/
 ENV/
 
-# Temporary Audio & Logs
-temp*.wav
-temp*.mp3
-*.log
-logs/
-Data/speech.mp3
-ChatLog.json
-Data/ChatLog.json
-*.jsonl
-rewrite_*.py
-
-# Databases & Local Dynamic Data
+# Databases & Runtime State (Keep repository clean and scalable)
+*.db
 *.db-journal
 *.db-wal
 *.db-shm
-decrypted.txt
-error_*.log
-test_*.png
+*.sqlite
+*.sqlite3
+Data/JarvisMemory.db
+Data/VectorMemory/
+Data/MicIndex.txt
+Data/Workspace/
+Frontend/Files/*.data
 
-# Node & Build artifacts
+# Temporary Files, Logs & Dynamic Media
+temp*
+*.wav
+*.mp3
+*.log
+logs/
+*.tmp
+*.bak
+decrypted.txt
+ChatLog.json
+Data/ChatLog.json
+Data/audit.jsonl
+Data/*.png
+*.jsonl
+
+# Node & Frontend Build Artifacts
 node_modules/
 dist/
+.vite/
 .vite-build/
 qa-shots/
 
-# OS specific
+# Operating System Files
 .DS_Store
 Thumbs.db
+desktop.ini
